@@ -56,7 +56,7 @@ dependencies {
     compile('org.docx4j:docx4j:6.1.2') {
         exclude group: 'org.slf4j'
     }
-    compile files("/home/gleb/Desktop/lac-application/libs/docx4j-search-and-replace-util-1.0.0.jar")
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // To parse response from dadata.ru
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
