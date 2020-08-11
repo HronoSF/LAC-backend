@@ -1,0 +1,73 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.2.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+group = 'com.github.hronosf'
+version = '0.0.1'
+sourceCompatibility = '1.8'
+description = "Application to legal assistance to consumers (LAC)"
+compileJava.options.encoding = 'UTF-8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repository.aspose.com/repo/' }
+    maven { url 'http://repo.e-iceblue.com/nexus/content/groups/public/' }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    // Spring framework:
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+//    implementation 'org.liquibase:liquibase-core'
+    compileOnly 'org.projectlombok:lombok'
+//    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // JWT-tokens:
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
+    // Time parser:
+    compile group: 'joda-time', name: 'joda-time', version: '2.10.6'
+
+    // Apache commons:
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+
+    // Apache poi to make from docx pdf file:
+    compile group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    compile group: 'fr.opensagres.xdocreport', name: 'fr.opensagres.poi.xwpf.converter.pdf', version: '2.0.2'
+    compile group: 'org.apache.poi', name: 'poi-scratchpad', version: '4.1.2'
+
+    // Docx handler
+    compile('org.docx4j:docx4j:6.1.2') {
+        exclude group: 'org.slf4j'
+    }
+    compile files("/libs/docx4j-search-and-replace-util-1.0.0.jar")
+
+    // To parse response from dadata.ru
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    compile group: 'com.h2database', name: 'h2', version: '1.4.200'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+}
+
+test {
+    useJUnitPlatform()
+}
