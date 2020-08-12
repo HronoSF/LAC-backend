@@ -6,6 +6,7 @@ import com.github.hronosf.dto.response.dadata.SellerInformationResponseDTO;
 import com.github.hronosf.services.DocumentGenerationService;
 import com.github.hronosf.services.connector.DadataConnector;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -44,7 +45,12 @@ public class DocumentGeneratorFacade {
         consumerAndSellerData.put("CONSACC", request.getCustomerAccountNumber());
 
         // purchase data:
-        consumerAndSellerData.put("PURCHDATA", request.getPurchaseData());
+
+        // parse date:
+        String date = DateTimeFormat.forPattern("dd.MM.yyyy")
+                .print(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parseDateTime(request.getPurchaseData()));
+
+        consumerAndSellerData.put("PURCHDATA", date);
         consumerAndSellerData.put("PRODUCT", request.getProductName());
 
         // date:
