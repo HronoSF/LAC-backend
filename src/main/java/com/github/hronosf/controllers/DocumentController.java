@@ -1,6 +1,6 @@
 package com.github.hronosf.controllers;
 
-import com.github.hronosf.model.payload.request.PreTrialAppealRequestDTO;
+import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
 import com.github.hronosf.services.facedes.DocumentGeneratorFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
 
@@ -20,7 +21,7 @@ public class DocumentController {
 
     @SneakyThrows
     @PostMapping("/generate_pretrial_appeal")
-    public void generatePreTrialAppeal(@RequestBody PreTrialAppealRequestDTO request, HttpServletResponse response) {
+    public void generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealRequestDTO request, HttpServletResponse response) {
         // get is from generated document:
         FileInputStream is = documentFacade.generatePreTrialAppeal(request);
 

@@ -1,7 +1,7 @@
 package com.github.hronosf.services.connector.impl;
 
-import com.github.hronosf.model.payload.response.dadata.CustomerInformationDTO;
-import com.github.hronosf.model.payload.response.dadata.SellerInformationDTO;
+import com.github.hronosf.dto.response.dadata.CustomerInformationResponseDTO;
+import com.github.hronosf.dto.response.dadata.SellerInformationResponseDTO;
 import com.github.hronosf.services.connector.DadataConnector;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -32,7 +32,7 @@ public class DadataConnectorImpl implements DadataConnector {
 
     @Override
     @SneakyThrows
-    public CustomerInformationDTO getCustomerBankInfoByBikOrInn(String bikOrInnOrSwift) {
+    public CustomerInformationResponseDTO getCustomerBankInfoByBikOrInn(String bikOrInnOrSwift) {
         String response = sendPostRequestToDadata(bikOrInnOrSwift, dadataCustomerInfoUrl);
 
         DocumentContext document = JsonPath.parse(response);
@@ -40,7 +40,7 @@ public class DadataConnectorImpl implements DadataConnector {
         String bik = document.read("$.suggestions[0].data.bic");
         String corrAcc = document.read("$.suggestions[0].data.correspondent_account");
 
-        return CustomerInformationDTO.builder()
+        return CustomerInformationResponseDTO.builder()
                 .name(bankName)
                 .bik(bik)
                 .corrAcc(corrAcc)
@@ -49,15 +49,14 @@ public class DadataConnectorImpl implements DadataConnector {
 
     @Override
     @SneakyThrows
-    public SellerInformationDTO getSellerInfoByInn(String inn) {
+    public SellerInformationResponseDTO getSellerInfoByInn(String inn) {
         String response = sendPostRequestToDadata(inn, dadataSellerInfoUrl);
 
         DocumentContext document = JsonPath.parse(response);
         String name = document.read("$.suggestions[0].data.name.full_with_opf");
         String address = document.read("$.suggestions[0].data.address.unrestricted_value");
-//        String phoneNumber = document.read("$.suggestions[0].data.address.unrestricted_value");
 
-        return SellerInformationDTO.builder()
+        return SellerInformationResponseDTO.builder()
                 .name(name)
                 .inn(inn)
                 .address(address)

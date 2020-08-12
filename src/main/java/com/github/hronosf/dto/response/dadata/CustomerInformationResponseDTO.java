@@ -1,11 +1,11 @@
-package com.github.hronosf.model.payload.response.dadata;
+package com.github.hronosf.dto.response.dadata;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class CustomerInformationDTO {
+public class CustomerInformationResponseDTO {
 
     private final String name;
     private final String bik;

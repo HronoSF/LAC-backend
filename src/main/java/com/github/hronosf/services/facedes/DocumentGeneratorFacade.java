@@ -1,8 +1,8 @@
 package com.github.hronosf.services.facedes;
 
-import com.github.hronosf.model.payload.request.PreTrialAppealRequestDTO;
-import com.github.hronosf.model.payload.response.dadata.CustomerInformationDTO;
-import com.github.hronosf.model.payload.response.dadata.SellerInformationDTO;
+import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
+import com.github.hronosf.dto.response.dadata.CustomerInformationResponseDTO;
+import com.github.hronosf.dto.response.dadata.SellerInformationResponseDTO;
 import com.github.hronosf.services.DocumentGenerationService;
 import com.github.hronosf.services.connector.DadataConnector;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class DocumentGeneratorFacade {
     private final DocumentGenerationService documentGenerationService;
 
     public FileInputStream generatePreTrialAppeal(PreTrialAppealRequestDTO request) {
-        SellerInformationDTO sellerInfo = dadataConnector.getSellerInfoByInn(request.getSellerINN());
-        CustomerInformationDTO consumerInfo = dadataConnector.getCustomerBankInfoByBikOrInn(request.getConsumerInfo());
+        SellerInformationResponseDTO sellerInfo = dadataConnector.getSellerInfoByInn(request.getSellerINN());
+        CustomerInformationResponseDTO consumerInfo = dadataConnector.getCustomerBankInfoByBikOrInn(request.getConsumerInfo());
 
         Map<String, String> consumerAndSellerData = new HashMap<>();
 

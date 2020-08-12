@@ -46,7 +46,7 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         // save ready docx file:
         Docx4J.save(wordMLPackage, new FileOutputStream(docx));
 
-        try (InputStream is = com.google.common.io.Files.asByteSource(new File(docx)).openStream();
+        try (InputStream is = new FileInputStream(docx);
              OutputStream out = new FileOutputStream(new File(pdf))) {
 
             // 1) Load DOCX into XWPFDocument
@@ -58,7 +58,6 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
             // delete generated docx:
             Files.delete(Paths.get(docx));
         }
-
         return new FileInputStream(pdf);
     }
 

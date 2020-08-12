@@ -25,17 +25,10 @@ repositories {
 
 dependencies {
     // Spring framework:
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation 'org.liquibase:liquibase-core'
     compileOnly 'org.projectlombok:lombok'
-//    runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-    testImplementation 'org.springframework.security:spring-security-test'
 
     // JWT-tokens:
     compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
@@ -61,11 +54,9 @@ dependencies {
     // To parse response from dadata.ru
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
 
-    // https://mvnrepository.com/artifact/com.h2database/h2
-    compile group: 'com.h2database', name: 'h2', version: '1.4.200'
-
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    // Data validation:
+    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.5.Final'
 }
 
 test {
