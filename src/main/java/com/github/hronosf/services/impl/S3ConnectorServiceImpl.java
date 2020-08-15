@@ -5,28 +5,32 @@ import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.github.hronosf.services.S3ConnectorService;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 
 @Slf4j
+@Service
 public class S3ConnectorServiceImpl implements S3ConnectorService {
 
     @Setter(onMethod = @__(@Autowired))
     private AmazonS3 s3Client;
 
-    @PostConstruct
-    public void init() {
-        createBucket("DocumentStorage");
-    }
+    @Getter
+    @Value("${s3.bucket.name}")
+    private String s3BucketName;
 
-    public Bucket createBucket(String bucketName) {
-        log.debug("Creating bucket {}", bucketName);
-        return s3Client.createBucket(new CreateBucketRequest(bucketName));
+    @PostConstruct
+    public void createBucketIfNotExist() {
+        if (!s3Client.doesBucketExistV2(s3BucketName)) {
+            log.debug("Creating bucket {}", s3BucketName);
+            s3Client.createBucket(new CreateBucketRequest(s3BucketName));
+        }
     }
 
     @SneakyThrows

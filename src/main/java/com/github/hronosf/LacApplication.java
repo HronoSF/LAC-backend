@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 @CrossOrigin
 @EnableScheduling
-@SpringBootApplication
 @EnableAspectJAutoProxy
+@SpringBootApplication(scanBasePackages = {"com.github.hronosf"})
 public class LacApplication {
 
     public static void main(String[] args) {

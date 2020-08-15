@@ -32,8 +32,7 @@ public class DocumentServiceImpl implements DocumentService {
                 , request.getFirstName()
                 , request.getMiddleName() == null ? StringUtils.EMPTY : request.getMiddleName());
 
-        consumerAndSellerData.put("CONSUMER"
-                , consumerFullName);
+        consumerAndSellerData.put("CONSUMER", consumerFullName);
         consumerAndSellerData.put("CONADR", request.getAddress());
 
         consumerAndSellerData.put("BANKNAME", request.getConsumerBankName());
