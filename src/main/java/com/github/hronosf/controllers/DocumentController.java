@@ -1,39 +1,31 @@
 package com.github.hronosf.controllers;
 
+import com.github.hronosf.dto.request.PostInventoryRequestDTO;
 import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
-import com.github.hronosf.services.facedes.DocumentGeneratorFacade;
+import com.github.hronosf.services.DocumentService;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/documents")
 public class DocumentController {
 
-    private final DocumentGeneratorFacade documentFacade;
+    private final DocumentService documentService;
 
-    @SneakyThrows
-    @PostMapping("/generate_pretrial_appeal")
-    public void generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealRequestDTO request, HttpServletResponse response) {
-        // get is from generated document:
-        FileInputStream is = documentFacade.generatePreTrialAppeal(request);
+    @PostMapping(value = "/generate_pretrial_appeal", produces = "application/pdf")
+    public HttpEntity<Resource> generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealRequestDTO request) {
+        return new HttpEntity<>(new FileSystemResource(documentService.generatePreTrialAppeal(request)));
+    }
 
-        // set content type to allow preview of pdf:
-        response.setContentType("application/pdf");
-
-        // write pdf as data-stream:
-        try (PrintWriter writer = response.getWriter()) {
-            int nRead;
-            while ((nRead = is.read()) != -1) {
-                writer.write(nRead);
-            }
-        }
+    @PostMapping(value = "/generate_post_inventory", produces = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    public HttpEntity<Resource> generatePostInventory(@RequestBody PostInventoryRequestDTO request) {
+        return new HttpEntity<>(new FileSystemResource(documentService.generatePostInventory(request)));
     }
 }

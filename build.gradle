@@ -27,6 +27,7 @@ dependencies {
     // Spring framework:
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
@@ -51,12 +52,15 @@ dependencies {
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    // To parse response from dadata.ru
-    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
-
     // Data validation:
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.5.Final'
+
+    // Amazon's SDK:
+    compile 'com.amazonaws:aws-java-sdk-s3'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.228'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.524'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-logs', version: '1.11.524'
 }
 
 test {

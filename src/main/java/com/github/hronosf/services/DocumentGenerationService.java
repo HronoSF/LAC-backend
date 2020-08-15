@@ -1,9 +1,10 @@
 package com.github.hronosf.services;
 
-import java.io.FileInputStream;
 import java.util.Map;
 
 public interface DocumentGenerationService {
 
-    FileInputStream generatePretrialDocument(Map<String, String> dataToFill);
+    String generatePretrialAppeal(Map<String, String> mappings);
+
+    String generatePostInventory(Map<String, String> mappings);
 }
