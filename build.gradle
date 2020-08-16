@@ -63,6 +63,10 @@ dependencies {
     compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.228'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.524'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-logs', version: '1.11.524'
+
+    // Swagger:
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
 }
 
 test {
