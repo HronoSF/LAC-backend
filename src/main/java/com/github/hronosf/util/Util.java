@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -30,7 +31,7 @@ public final class Util {
                 .format("%s%s%s-%s-%s.%s"
                         , Constants.PATH.getValue().toAbsolutePath().toString()
                         , File.separator
-                        , name.replaceAll(StringUtils.SPACE, "-")
+                        , new String(name.replaceAll(StringUtils.SPACE, "-").getBytes(), StandardCharsets.UTF_8)
                         , new SimpleDateFormat("dd.MM.yyyy").format(new Date())
                         , UUID.randomUUID().toString().substring(0, 5)
                         , extension);

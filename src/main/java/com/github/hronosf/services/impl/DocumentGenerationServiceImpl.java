@@ -11,6 +11,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.docx4j.Docx4J;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -31,20 +32,18 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         loadedTemplates = new HashMap<>();
 
         // load to cache all docx-templates:
-        final File pathToFolderWithTemplates = new File(this.getClass().getResource("/templates").getPath());
-
-        Arrays.stream(Objects.requireNonNull(pathToFolderWithTemplates.listFiles()))
-                .forEach(file -> {
+        Arrays.stream(new PathMatchingResourcePatternResolver().getResources("templates/*.docx"))
+                .forEach(resource -> {
                     WordprocessingMLPackage mlPackage = null;
                     try {
                         mlPackage = WordprocessingMLPackage
-                                .load(this.getClass().getResourceAsStream("/templates/" + file.getName()));
+                                .load(this.getClass().getResourceAsStream("/templates/" + resource.getFilename()));
                     } catch (Docx4JException e) {
                         log.error("Failed to load mlPackage for docx file", e);
                     }
 
-                    log.debug("Loaded {} file to templates", file.getName());
-                    loadedTemplates.put(StringUtils.substringBefore(file.getName(), "."), mlPackage);
+                    log.debug("Loaded {} file to templates", resource.getFilename());
+                    loadedTemplates.put(StringUtils.substringBefore(resource.getFilename(), "."), mlPackage);
                 });
 
         // create folder to store generated files:
