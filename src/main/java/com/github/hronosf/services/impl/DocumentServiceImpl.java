@@ -54,6 +54,7 @@ public class DocumentServiceImpl implements DocumentService {
         Map<String, String> sellerData = new HashMap<>();
 
         // seller's data:
+        sellerData.put("CONSUMER", request.getConsumerName());
         sellerData.put("SELLER", request.getSellerName());
         sellerData.put("SELADR", request.getSellerAddress());
 

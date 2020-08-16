@@ -26,14 +26,15 @@ public final class Util {
     }
 
     @SuppressWarnings("java:S5361")
-    public static String buildFileName(String name, String extension) {
+    public static String buildFileName(String name, String type, String extension) {
         return String
-                .format("%s%s%s-%s-%s.%s"
+                .format("%s%s%s_%s_%s_%s.%s"
                         , Constants.PATH.getValue().toAbsolutePath().toString()
                         , File.separator
                         , new String(name.replaceAll(StringUtils.SPACE, "-").getBytes(), StandardCharsets.UTF_8)
+                        , type
                         , new SimpleDateFormat("dd.MM.yyyy").format(new Date())
-                        , UUID.randomUUID().toString().substring(0, 5)
+                        , UUID.randomUUID().toString().substring(0, 10)
                         , extension);
     }
 

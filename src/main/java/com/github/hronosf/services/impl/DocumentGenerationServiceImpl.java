@@ -57,7 +57,7 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"));
 
         // generate file name:
-        String pdf = Util.buildFileName(mappings.get("CONSUMER"), ".pdf");
+        String pdf = Util.buildFileName(mappings.get("CONSUMER"), "pre-trial-appeal", ".pdf");
 
         // convert docx to pdf:
         try (InputStream is = new FileInputStream(filledDocx);
@@ -89,7 +89,7 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         Docx4JSRUtil.searchAndReplace(wordMLPackage, mappings);
 
         // paths to files:
-        String docx = Util.buildFileName(mappings.get("SELLER"), ".docx");
+        String docx = Util.buildFileName(mappings.get("CONSUMER"), "post-inventory", ".docx");
 
         // save ready docx file:
         Docx4J.save(wordMLPackage, new FileOutputStream(docx));

@@ -33,7 +33,6 @@ public class S3ConnectorServiceImpl implements S3ConnectorService {
         }
     }
 
-    @SneakyThrows
     public void uploadFileToS3(String keyName, String filePath, String bucketName) {
         log.debug("Uploading {} file to {} bucket", keyName, bucketName);
         TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();
