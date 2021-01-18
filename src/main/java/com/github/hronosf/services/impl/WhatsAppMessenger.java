@@ -20,8 +20,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WhatsAppMessenger {
 
-    public static final String ACCOUNT_SID = "AC8396a461f6835cbe45f7b2023a5e3a37";
-    public static final String AUTH_TOKEN = "07247fcdde2227febffdc02012c250eb";
+    public static final String ACCOUNT_SID = "";
+    public static final String AUTH_TOKEN = "";
 
     private final UserAccountActivationRepository userAccountActivationRepository;
 
