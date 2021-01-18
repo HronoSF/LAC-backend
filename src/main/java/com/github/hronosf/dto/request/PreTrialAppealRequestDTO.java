@@ -1,23 +1,22 @@
 package com.github.hronosf.dto.request;
 
 import com.github.hronosf.validation.annotations.InnSwiftBik;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PreTrialAppealRequestDTO {
-
-    // Common info about consumer:
-    private String firstName;
-    private String middleName;
-    private String lastName;
-    private String address;
+public class PreTrialAppealRequestDTO extends RequestWithUserDataDTO {
 
     // Consumer bank info:
+    @InnSwiftBik(message = "Некорректное значение поля INN/SWIFT/BIK, проверьте введённые данные")
     private String consumerBankBik;
+
     private String consumerBankName;
+
     private String consumerBankCorrAcc;
 
     @InnSwiftBik(message = "Некорректное значение поля INN/SWIFT/BIK, проверьте введённые данные")
@@ -36,4 +35,6 @@ public class PreTrialAppealRequestDTO {
 
     @InnSwiftBik(message = "Некорректное значение поля INN продавца, проверьте введённые данные")
     private String sellerINN;
+
+    private boolean saveUserData;
 }

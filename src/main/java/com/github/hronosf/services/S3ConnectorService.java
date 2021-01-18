@@ -7,4 +7,6 @@ public interface S3ConnectorService {
     void uploadFileToS3(String keyName, String filePath, String bucketName);
 
     S3Object getFileFromS3(String bucketName, String key);
+
+    String getS3BucketName();
 }

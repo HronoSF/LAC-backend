@@ -4,13 +4,15 @@ import com.github.hronosf.dto.request.PostInventoryRequestDTO;
 import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
 import com.github.hronosf.services.DocumentGenerationService;
 import com.github.hronosf.services.DocumentService;
-import com.github.hronosf.util.Util;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +43,15 @@ public class DocumentServiceImpl implements DocumentService {
         consumerAndSellerData.put("CONSACC", request.getFirstName());
 
         // purchase data:
-        consumerAndSellerData.put("PURCHDATA", Util.parseJsDatePickerDate(request.getPurchaseData()));
+        consumerAndSellerData.put("PURCHDATA",
+                DateTimeFormat.forPattern("dd.MM.yyyy")
+                        .print(
+                                DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                                        .parseDateTime(request.getPurchaseData()
+                                        )
+                        )
+        );
+
         consumerAndSellerData.put("PRODUCT", request.getProductName());
 
         // date:

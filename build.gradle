@@ -29,6 +29,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web') {
         exclude group: "org.springframework.boot", module: 'spring-boot-starter-logging'
     }
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -67,6 +68,15 @@ dependencies {
     // Swagger:
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+
+    // Mapstruct
+    compile group: 'org.mapstruct', name: 'mapstruct', version: '1.4.1.Final'
+
+    // Postgres:
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+
+    // Twilio:
+    compile group: 'com.twilio.sdk', name: 'twilio', version: '8.6.0'
 }
 
 test {

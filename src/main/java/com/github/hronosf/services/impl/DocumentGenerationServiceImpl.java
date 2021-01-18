@@ -2,8 +2,9 @@ package com.github.hronosf.services.impl;
 
 import com.github.hronosf.enums.Constants;
 import com.github.hronosf.services.DocumentGenerationService;
-import com.github.hronosf.util.Util;
+import com.github.hronosf.services.S3ConnectorService;
 import de.phip1611.Docx4JSRUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,14 +17,17 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DocumentGenerationServiceImpl implements DocumentGenerationService {
 
+    private final S3ConnectorService s3ConnectorService;
     private Map<String, WordprocessingMLPackage> loadedTemplates;
 
     @SneakyThrows
@@ -57,22 +61,23 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"));
 
         // generate file name:
-        String pdf = Util.buildFileName(mappings.get("CONSUMER"), "pre-trial-appeal", ".pdf");
+        String pdf = buildFileName(mappings.get("CONSUMER"), "pre-trial-appeal", ".pdf");
 
         // convert docx to pdf:
         try (InputStream is = new FileInputStream(filledDocx);
-             OutputStream out = new FileOutputStream(new File(pdf))) {
+             OutputStream out = new FileOutputStream(pdf)) {
 
             // 1) Load DOCX into XWPFDocument
             XWPFDocument document = new XWPFDocument(is);
 
             // 2) Convert XWPFDocument to Pdf
             fr.opensagres.poi.xwpf.converter.pdf.PdfConverter.getInstance().convert(document, out, null);
-        } finally {
-            // delete generated docx:
-            Files.delete(Paths.get(filledDocx));
         }
+
         log.debug("Generated {} file", pdf);
+
+        // upload to S3:
+        uploadGeneratedDocumentToS3(pdf);
 
         return pdf;
     }
@@ -89,12 +94,41 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         Docx4JSRUtil.searchAndReplace(wordMLPackage, mappings);
 
         // paths to files:
-        String docx = Util.buildFileName(mappings.get("CONSUMER"), "post-inventory", ".docx");
+        String docx = buildFileName(mappings.get("CONSUMER"), "post-inventory", ".docx");
 
         // save ready docx file:
         Docx4J.save(wordMLPackage, new FileOutputStream(docx));
 
         log.debug("Generated {} file", docx);
+
+        // upload to S3:
+        uploadGeneratedDocumentToS3(docx);
+
         return docx;
+    }
+
+    private void uploadGeneratedDocumentToS3(String path) {
+        String keyName = StringUtils.substringBetween(path, "generatedDocuments" + File.separator, "_") + "/";
+        String pathToFileInBucket = StringUtils.substringAfter(path, "generatedDocuments" + File.separator);
+
+        log.debug("Uploading generated doc to S3 to bucket:{} with path:{}/{}"
+                , s3ConnectorService.getS3BucketName()
+                , keyName
+                , pathToFileInBucket);
+
+        s3ConnectorService.uploadFileToS3(keyName + pathToFileInBucket, path, s3ConnectorService.getS3BucketName());
+    }
+
+    @SuppressWarnings("java:S5361")
+    public String buildFileName(String name, String type, String extension) {
+        return String
+                .format("%s%s%s_%s_%s_%s.%s"
+                        , Constants.PATH.getValue().toAbsolutePath().toString()
+                        , File.separator
+                        , new String(name.replaceAll(StringUtils.SPACE, "-").getBytes(), Charset.defaultCharset())
+                        , type
+                        , new SimpleDateFormat("dd.MM.yyyy").format(new Date())
+                        , UUID.randomUUID().toString().substring(0, 10)
+                        , extension);
     }
 }

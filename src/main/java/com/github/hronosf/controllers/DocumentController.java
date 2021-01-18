@@ -3,13 +3,16 @@ package com.github.hronosf.controllers;
 import com.github.hronosf.dto.request.PostInventoryRequestDTO;
 import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
 import com.github.hronosf.services.DocumentService;
+import com.github.hronosf.services.impl.UserProfileServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 
@@ -19,10 +22,15 @@ import javax.validation.Valid;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final UserProfileServiceImpl userProfileService;
 
     @ApiOperation(value = "Generation of Pre-Trial Appeal")
     @PostMapping(value = "/generate_pretrial_appeal", produces = "application/pdf")
     public HttpEntity<Resource> generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealRequestDTO request) {
+        if (request.isSaveUserData()) {
+            userProfileService.registerNewUser(request);
+        }
+
         return new HttpEntity<>(new FileSystemResource(documentService.generatePreTrialAppeal(request)));
     }
 

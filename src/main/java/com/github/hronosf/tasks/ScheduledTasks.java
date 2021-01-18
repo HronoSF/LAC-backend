@@ -16,7 +16,7 @@ public class ScheduledTasks {
     @SneakyThrows
     @Scheduled(cron = "0 0/3 * * * ?")
     public void cleanGeneratedFilesFolder() {
-        log.debug("Scheduled job works, clearing target folder......");
+        log.debug("Scheduled job works - clearing folder {} with files", Constants.PATH.getValue());
         FileUtils.cleanDirectory(Constants.PATH.getValue().toFile());
     }
 }
