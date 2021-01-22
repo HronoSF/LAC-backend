@@ -35,19 +35,21 @@ public class Client {
 
     private String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private List<ClientAccount> bankData;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private ClientProfileVarification activationData;
+    @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)
+    private ClientProfileVerification activationData;
 
     @Builder.Default
     @Column(name = "is_activated")
     private boolean isActivated = false;
 
+    @Builder.Default
     @Column(name = "registration_date")
-    private Date registrationDate;
+    private Date registrationDate = new Date();
 
+    @Builder.Default
     @Column(name = "update_at")
-    private Date updatedAtDate;
+    private Date updatedAtDate = new Date();
 }

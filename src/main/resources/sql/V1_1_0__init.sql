@@ -17,7 +17,7 @@ CREATE TABLE client_data
 CREATE TABLE client_account
 (
     id             varchar(100) NOT NULL,
-    user_id        varchar(100) NOT NULL,
+    client_id      varchar(100) NOT NULL,
     bik            varchar(100) NOT NULL,
     bank_name      varchar(255) NOT NULL,
     bank_corr_acc  varchar(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE client_account
     account_number varchar(255) NOT NULL,
     created_at     TIMESTAMP DEFAULT now(),
     CONSTRAINT "pk_client_account.client_account" PRIMARY KEY (id),
-    CONSTRAINT "fk_client_account.client_account" FOREIGN KEY (user_id)
+    CONSTRAINT "fk_client_account.client_account" FOREIGN KEY (client_id)
         REFERENCES client_data (id)
         ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -33,13 +33,13 @@ CREATE TABLE client_account
 CREATE TABLE client_profile_activation_data
 (
     id          varchar(100) NOT NULL,
-    user_id     varchar(100) NOT NULL,
+    client_id   varchar(100) NOT NULL,
     code        int          NOT NULL,
     send_at     TIMESTAMP   DEFAULT now(),
     valid_to    TIMESTAMP   DEFAULT now(),
-    code_status varchar(50) DEFAULT NULL,
+    status varchar(50) DEFAULT NULL,
     CONSTRAINT "pk_client_profile_activation_data.client_profile_activation_data" PRIMARY KEY (id),
-    CONSTRAINT "fk_client_profile_activation_data.client_profile_activation_data" FOREIGN KEY (user_id)
+    CONSTRAINT "fk_client_profile_activation_data.client_profile_activation_data" FOREIGN KEY (client_id)
         REFERENCES client_data (id)
         ON UPDATE NO ACTION ON DELETE NO ACTION
 )

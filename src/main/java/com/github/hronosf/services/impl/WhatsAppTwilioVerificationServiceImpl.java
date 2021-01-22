@@ -1,7 +1,7 @@
 package com.github.hronosf.services.impl;
 
 import com.github.hronosf.domain.Client;
-import com.github.hronosf.domain.ClientProfileVarification;
+import com.github.hronosf.domain.ClientProfileVerification;
 import com.github.hronosf.enums.ActivationCodeStatus;
 import com.github.hronosf.exceptions.ActivationCodeNotValidException;
 import com.github.hronosf.repository.ClientAccountActivationRepository;
@@ -25,20 +25,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WhatsAppTwilioVerificationServiceImpl implements VerificationService {
 
+    @Value("${twilio.account.sid}")
+    private String twilioAccountSid;
+
+    @Value("${twilio.auth.token}")
+    private String twilioAuthToken;
+
     private final ClientAccountActivationRepository clientAccountActivationRepository;
 
     @PostConstruct
-    public void initTwilio(@Value("twilio.account.sid") String twilioAccountSid,
-                           @Value("twilio.auth.token") String twilioAuthToken) {
+    public void initTwilio() {
         Twilio.init(twilioAccountSid, twilioAuthToken);
     }
 
     @Override
-    public ClientProfileVarification sendVerificationCode(Client client) {
+    public ClientProfileVerification sendVerificationCode(Client client) {
         int accessCode = generateVerificationCode();
 
         Date now = new Date();
-        ClientProfileVarification activationInfo = ClientProfileVarification.builder()
+        ClientProfileVerification activationInfo = ClientProfileVerification.builder()
                 .id(UUID.randomUUID().toString())
                 .validToTimeStamp(DateUtils.addMinutes(now, 5))
                 .client(client)
@@ -47,6 +52,7 @@ public class WhatsAppTwilioVerificationServiceImpl implements VerificationServic
                 .build();
 
         clientAccountActivationRepository.save(activationInfo);
+
 
         Message message = Message.creator(
                 new PhoneNumber("whatsapp:" + client.getPhoneNumber()),
@@ -64,7 +70,7 @@ public class WhatsAppTwilioVerificationServiceImpl implements VerificationServic
 
     @Override
     public void markVerificationCodeAsUsed(Client client) {
-        ClientProfileVarification activationData = client.getActivationData();
+        ClientProfileVerification activationData = client.getActivationData();
 
         if (activationData.getStatus().equals(ActivationCodeStatus.NEW) &&
                 activationData.getValidToTimeStamp().compareTo(new Date()) >= 0) {
@@ -78,6 +84,6 @@ public class WhatsAppTwilioVerificationServiceImpl implements VerificationServic
 
     @Override
     public int generateVerificationCode() {
-        return 1000 + new Random().nextInt(90000);
+        return 1000 + new Random().nextInt(9000);
     }
 }

@@ -48,8 +48,6 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         clientRepository.save(newClient);
 
-        verificationService.sendVerificationCode(newClient);
-
         if (request instanceof PreTrialAppealDTO) {
             PreTrialAppealDTO preTrialRequest = (PreTrialAppealDTO) request;
 

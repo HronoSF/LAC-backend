@@ -1,11 +1,11 @@
 package com.github.hronosf.services;
 
 import com.github.hronosf.domain.Client;
-import com.github.hronosf.domain.ClientProfileVarification;
+import com.github.hronosf.domain.ClientProfileVerification;
 
 public interface VerificationService {
 
-    ClientProfileVarification sendVerificationCode(Client client);
+    ClientProfileVerification sendVerificationCode(Client client);
 
     void markVerificationCodeAsUsed(Client client);
 

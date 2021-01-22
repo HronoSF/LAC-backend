@@ -10,7 +10,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "client_profile_activation_data")
+@Table(name = "client_account")
 public class ClientAccount {
 
     @Id
@@ -35,6 +35,6 @@ public class ClientAccount {
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 }

@@ -11,8 +11,8 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "profile_activation")
-public class ClientProfileVarification {
+@Table(name = "client_profile_activation_data")
+public class ClientProfileVerification {
 
     @Id
     private String id;
@@ -29,7 +29,7 @@ public class ClientProfileVarification {
 
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
     @Builder.Default

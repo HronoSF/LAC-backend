@@ -12,7 +12,7 @@ public class AdminController {
 
     @ApiIgnore
     @GetMapping("/get_api_token")
-    public String getDadataAccessKey(@Value("dadata.api.key") String apiKey) {
+    public String getDadataAccessKey(@Value("${dadata.api.key}") String apiKey) {
         return apiKey;
     }
 }
