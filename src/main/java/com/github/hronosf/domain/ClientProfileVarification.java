@@ -1,5 +1,6 @@
 package com.github.hronosf.domain;
 
+import com.github.hronosf.enums.ActivationCodeStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "profile_activation")
-public class UserAccountActivation {
+public class ClientProfileVarification {
 
     @Id
     private String id;
@@ -29,5 +30,9 @@ public class UserAccountActivation {
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Client client;
+
+    @Builder.Default
+    @Enumerated(EnumType.ORDINAL)
+    private ActivationCodeStatus status = ActivationCodeStatus.NEW;
 }

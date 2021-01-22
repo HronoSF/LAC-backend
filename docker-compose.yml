@@ -1,14 +1,10 @@
 version: "3.3"
 
-networks:
-  app_network:
-    driver: bridge
-
 services:
   localstack:
     container_name: s3
     image: localstack/localstack:latest
-    restart: always
+    restart: on-failure
     ports:
       - "4566-4599:4566-4599"
     environment:
@@ -16,17 +12,14 @@ services:
       - DEFAULT_REGION=us-east-2
       - USE_SSL=false
       - DEBUG=1
-    networks:
-      - app_network
 
-  lac-backend:
-    container_name: lac-backend
-    build:
-      context: .
-      dockerfile: Dockerfile
+  postgres:
+    container_name: postgres
+    image: postgres:9.6.20-alpine
+    restart: on-failure
     ports:
-      - "5000:5000"
-    depends_on:
-      - localstack
-    networks:
-      - app_network
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=passw@rd
+      - POSTGRES_USER=loc@l
+      - POSTGRES_DB=test

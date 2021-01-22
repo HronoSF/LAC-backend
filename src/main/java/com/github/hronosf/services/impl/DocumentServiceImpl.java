@@ -1,7 +1,7 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.dto.request.PostInventoryRequestDTO;
-import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
+import com.github.hronosf.dto.request.PostInventoryDTO;
+import com.github.hronosf.dto.request.PreTrialAppealDTO;
 import com.github.hronosf.services.DocumentGenerationService;
 import com.github.hronosf.services.DocumentService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentGenerationService documentGenerationService;
 
-    public String generatePreTrialAppeal(PreTrialAppealRequestDTO request) {
+    public String generatePreTrialAppeal(PreTrialAppealDTO request) {
         Map<String, String> consumerAndSellerData = new HashMap<>();
 
         // seller's data:
@@ -60,7 +60,7 @@ public class DocumentServiceImpl implements DocumentService {
         return documentGenerationService.generatePretrialAppeal(consumerAndSellerData);
     }
 
-    public String generatePostInventory(PostInventoryRequestDTO request) {
+    public String generatePostInventory(PostInventoryDTO request) {
         Map<String, String> sellerData = new HashMap<>();
 
         // seller's data:

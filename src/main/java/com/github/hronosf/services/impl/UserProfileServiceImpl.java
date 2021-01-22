@@ -1,22 +1,22 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.domain.User;
-import com.github.hronosf.domain.UserAccount;
-import com.github.hronosf.domain.UserAccountActivation;
-import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
+import com.github.hronosf.domain.Client;
+import com.github.hronosf.domain.ClientAccount;
+import com.github.hronosf.dto.request.ClientProfileActivationDTO;
+import com.github.hronosf.dto.request.PreTrialAppealDTO;
 import com.github.hronosf.dto.request.RequestWithUserDataDTO;
-import com.github.hronosf.repository.UserAccountRepository;
-import com.github.hronosf.repository.UserRepository;
+import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
+import com.github.hronosf.exceptions.ClientNotFoundException;
+import com.github.hronosf.repository.ClientAccountRepository;
+import com.github.hronosf.repository.ClientRepository;
 import com.github.hronosf.services.UserProfileService;
+import com.github.hronosf.services.VerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 @Slf4j
@@ -24,69 +24,86 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
 
-    private final WhatsAppMessenger whatsAppService;
+    private final VerificationService verificationService;
 
-    private final UserRepository userRepository;
-    private final UserAccountRepository userAccountRepository;
+    private final ClientRepository clientRepository;
+    private final ClientAccountRepository clientAccountRepository;
 
+    @Override
     @Transactional
     public <T extends RequestWithUserDataDTO> void registerNewUser(T request) {
-        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+        if (clientRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             log.debug("User with email {} already exist", request.getPhoneNumber());
             return;
         }
 
-        User newUser = User.builder()
+        Client newClient = Client.builder()
                 .id(UUID.randomUUID().toString())
-                .name(buildName(request))
+                .firstName(request.getFirstName())
+                .middleName(request.getMiddleName())
+                .lastName(request.getLastName())
                 .address(request.getAddress())
                 .phoneNumber(request.getPhoneNumber())
                 .build();
 
-        userRepository.save(newUser);
+        clientRepository.save(newClient);
 
-        UserAccountActivation activationData = whatsAppService.sendVerificationCode(
-                newUser, 1000 + new Random().nextInt(8999)
-        );
-        newUser.setActivationData(activationData);
+        verificationService.sendVerificationCode(newClient);
 
-        if (request instanceof PreTrialAppealRequestDTO) {
-            PreTrialAppealRequestDTO preTrialRequest = (PreTrialAppealRequestDTO) request;
+        if (request instanceof PreTrialAppealDTO) {
+            PreTrialAppealDTO preTrialRequest = (PreTrialAppealDTO) request;
 
-            UserAccount newUserAccount = UserAccount.builder()
+            ClientAccount newClientAccount = ClientAccount.builder()
                     .id(UUID.randomUUID().toString())
                     .bik(preTrialRequest.getConsumerBankBik())
                     .bankName(preTrialRequest.getConsumerBankName())
                     .bankCorrAcc(preTrialRequest.getConsumerBankCorrAcc())
                     .info(preTrialRequest.getConsumerInfo())
                     .accountNumber(preTrialRequest.getCustomerAccountNumber())
-                    .user(newUser)
+                    .client(newClient)
                     .build();
 
             // save user's bank data:
-            userAccountRepository.save(newUserAccount);
+            clientAccountRepository.save(newClientAccount);
 
             // update user entity with bank data:
-            newUser.setBankData(Collections.singletonList(newUserAccount));
+            newClient.setBankData(Collections.singletonList(newClientAccount));
         }
 
-        userRepository.save(newUser);
+        clientRepository.save(newClient);
     }
 
-    public void getByPhoneNumber(String phoneNumber) {
-        Optional<User> user = userRepository.getByPhoneNumber(phoneNumber);
+    @Override
+    public Client getByPhoneNumber(String phoneNumber) {
+        return clientRepository
+                .getByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new ClientNotFoundException(phoneNumber));
+    }
 
-        if (user.isPresent()) {
+    @Override
+    public void sendVerificationCode(String phoneNumber) {
+        Client client = getClientIfNotActivated(phoneNumber);
 
+        verificationService.sendVerificationCode(client);
+    }
+
+    @Override
+    @Transactional
+    public void activateClientProfile(ClientProfileActivationDTO request) {
+        Client client = getClientIfNotActivated(request.getPhoneNumber());
+        verificationService.markVerificationCodeAsUsed(client);
+
+        client.setActivated(true);
+        clientRepository.save(client);
+    }
+
+    private Client getClientIfNotActivated(String phoneNumber) {
+        Client client = getByPhoneNumber(phoneNumber);
+
+        if (!client.isActivated()) {
+            return client;
+        } else {
+            throw new ClientAlreadyActivatedException(client.getPhoneNumber());
         }
-    }
-
-    private String buildName(RequestWithUserDataDTO request) {
-        return String.format("%s %s %s",
-                request.getFirstName(),
-                StringUtils.isNotBlank(request.getMiddleName()) ? request.getMiddleName() : StringUtils.EMPTY,
-                request.getLastName())
-                .replace("\\s+", StringUtils.EMPTY)
-                .trim();
     }
 }

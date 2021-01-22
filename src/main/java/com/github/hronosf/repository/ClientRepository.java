@@ -1,15 +1,15 @@
 package com.github.hronosf.repository;
 
-import com.github.hronosf.domain.User;
+import com.github.hronosf.domain.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
+public interface ClientRepository extends JpaRepository<Client, String> {
 
     boolean existsByPhoneNumber(String phoneNumber);
 
-    Optional<User> getByPhoneNumber(String phoneNumber);
+    Optional<Client> getByPhoneNumber(String phoneNumber);
 }

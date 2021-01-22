@@ -1,7 +1,7 @@
 package com.github.hronosf.controllers;
 
-import com.github.hronosf.dto.request.PostInventoryRequestDTO;
-import com.github.hronosf.dto.request.PreTrialAppealRequestDTO;
+import com.github.hronosf.dto.request.PostInventoryDTO;
+import com.github.hronosf.dto.request.PreTrialAppealDTO;
 import com.github.hronosf.services.DocumentService;
 import com.github.hronosf.services.impl.UserProfileServiceImpl;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +26,7 @@ public class DocumentController {
 
     @ApiOperation(value = "Generation of Pre-Trial Appeal")
     @PostMapping(value = "/generate_pretrial_appeal", produces = "application/pdf")
-    public HttpEntity<Resource> generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealRequestDTO request) {
+    public HttpEntity<Resource> generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealDTO request) {
         if (request.isSaveUserData()) {
             userProfileService.registerNewUser(request);
         }
@@ -36,7 +36,7 @@ public class DocumentController {
 
     @ApiOperation(value = "Generation of Russian Post inventory")
     @PostMapping(value = "/generate_post_inventory", produces = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    public HttpEntity<Resource> generatePostInventory(@RequestBody PostInventoryRequestDTO request) {
+    public HttpEntity<Resource> generatePostInventory(@RequestBody PostInventoryDTO request) {
         return new HttpEntity<>(new FileSystemResource(documentService.generatePostInventory(request)));
     }
 }

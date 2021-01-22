@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostInventoryRequestDTO {
+public class PostInventoryDTO {
 
     private String consumerName;
     private String sellerName;

@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Length;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PreTrialAppealRequestDTO extends RequestWithUserDataDTO {
+public class PreTrialAppealDTO extends RequestWithUserDataDTO {
 
     // Consumer bank info:
     @InnSwiftBik(message = "Некорректное значение поля INN/SWIFT/BIK, проверьте введённые данные")
