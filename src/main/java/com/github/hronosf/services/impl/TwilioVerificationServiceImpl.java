@@ -23,13 +23,16 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WhatsAppTwilioVerificationServiceImpl implements VerificationService {
+public class TwilioVerificationServiceImpl implements VerificationService {
 
     @Value("${twilio.account.sid}")
     private String twilioAccountSid;
 
     @Value("${twilio.auth.token}")
     private String twilioAuthToken;
+
+    @Value("${twilio.phone.number}")
+    private String twilioPhoneNumber;
 
     private final ClientAccountActivationRepository clientAccountActivationRepository;
 
@@ -53,14 +56,18 @@ public class WhatsAppTwilioVerificationServiceImpl implements VerificationServic
 
         clientAccountActivationRepository.save(activationInfo);
 
+// whatsapp:
+//        Message message = Message.creator(
+//                new PhoneNumber("whatsapp:" + client.getPhoneNumber()),
+//                new PhoneNumber("whatsapp:+14155238886"),
+//                "Код верификации: " + accessCode
+//        ).create();
 
-        Message message = Message.creator(
-                new PhoneNumber("whatsapp:" + client.getPhoneNumber()),
-                new PhoneNumber("whatsapp:+14155238886"),
+        Message.creator(
+                new PhoneNumber(client.getPhoneNumber()),
+                new PhoneNumber(twilioPhoneNumber),
                 "Код верификации: " + accessCode
         ).create();
-
-        log.debug("WhatsApp message {} sent", message);
 
         activationInfo.setSendAtTimeStamp(now);
         clientAccountActivationRepository.save(activationInfo);

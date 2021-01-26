@@ -7,14 +7,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class RequestWithUserDataDTO {
+public class ClientRegistrationRequestDTO {
 
     // Common info about consumer:
     protected String firstName;
     protected String middleName;
     protected String lastName;
     protected String address;
-
     protected String phoneNumber;
-    protected String password;
 }

@@ -111,24 +111,19 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         String keyName = StringUtils.substringBetween(path, "generatedDocuments" + File.separator, "_") + "/";
         String pathToFileInBucket = StringUtils.substringAfter(path, "generatedDocuments" + File.separator);
 
-        log.debug("Uploading generated doc to S3 to bucket:{} with path:{}/{}"
-                , s3ConnectorService.getS3BucketName()
-                , keyName
-                , pathToFileInBucket);
-
         s3ConnectorService.uploadFileToS3(keyName + pathToFileInBucket, path, s3ConnectorService.getS3BucketName());
     }
 
     @SuppressWarnings("java:S5361")
     public String buildFileName(String name, String type, String extension) {
         return String
-                .format("%s%s%s_%s_%s_%s.%s"
+                .format("%s%s%s_%s_%s_%s%s"
                         , Constants.PATH.getValue().toAbsolutePath().toString()
                         , File.separator
                         , new String(name.replaceAll(StringUtils.SPACE, "-").getBytes(), Charset.defaultCharset())
                         , type
-                        , new SimpleDateFormat("dd.MM.yyyy").format(new Date())
-                        , UUID.randomUUID().toString().substring(0, 10)
+                        , new SimpleDateFormat("dd_MM_yyyy").format(new Date())
+                        , UUID.randomUUID().toString().substring(0, 15)
                         , extension);
     }
 }

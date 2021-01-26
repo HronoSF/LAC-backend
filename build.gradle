@@ -1,7 +1,8 @@
 plugins {
+    id 'java'
+    id 'net.ltgt.apt' version '0.20'
     id 'org.springframework.boot' version '2.3.2.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'java'
 }
 
 group = 'com.github.hronosf'
@@ -31,8 +32,6 @@ dependencies {
     }
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
 
     // JWT-tokens:
     compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
@@ -71,12 +70,23 @@ dependencies {
 
     // Mapstruct
     compile group: 'org.mapstruct', name: 'mapstruct', version: '1.4.1.Final'
+    annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.4.1.Final'
+
+    // Lombok:
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     // Postgres:
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
 
     // Twilio:
     compile group: 'com.twilio.sdk', name: 'twilio', version: '8.6.0'
+
+    // Logback:
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+    compile group: 'ch.qos.logback.contrib', name: 'logback-jackson', version: '0.1.5'
+    compile group: 'ch.qos.logback.contrib', name: 'logback-json-classic', version: '0.1.5'
+
 }
 
 test {

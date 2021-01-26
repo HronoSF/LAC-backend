@@ -1,9 +1,7 @@
 package com.github.hronosf.repository;
 
 import com.github.hronosf.domain.ClientProfileVerification;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.CrudRepository;
 
-@Repository
-public interface ClientAccountActivationRepository extends JpaRepository<ClientProfileVerification, String> {
+public interface ClientAccountActivationRepository extends CrudRepository<ClientProfileVerification, String> {
 }

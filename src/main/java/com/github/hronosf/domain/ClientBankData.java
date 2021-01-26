@@ -10,8 +10,8 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "client_account")
-public class ClientAccount {
+@Table(name = "client_bank_data")
+public class ClientBankData {
 
     @Id
     private String id;
@@ -31,7 +31,7 @@ public class ClientAccount {
 
     @Builder.Default
     @Column(name = "created_at")
-    private Date createdAtTimeStamp = new Date();
+    private Date createdAt = new Date();
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

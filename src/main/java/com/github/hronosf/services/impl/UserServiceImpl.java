@@ -1,15 +1,15 @@
 package com.github.hronosf.services.impl;
 
 import com.github.hronosf.domain.Client;
-import com.github.hronosf.domain.ClientAccount;
+import com.github.hronosf.domain.ClientBankData;
 import com.github.hronosf.dto.request.ClientProfileActivationDTO;
 import com.github.hronosf.dto.request.PreTrialAppealDTO;
-import com.github.hronosf.dto.request.RequestWithUserDataDTO;
+import com.github.hronosf.dto.request.ClientRegistrationRequestDTO;
 import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
 import com.github.hronosf.exceptions.ClientNotFoundException;
-import com.github.hronosf.repository.ClientAccountRepository;
 import com.github.hronosf.repository.ClientRepository;
-import com.github.hronosf.services.UserProfileService;
+import com.github.hronosf.services.UserBankDataService;
+import com.github.hronosf.services.UserService;
 import com.github.hronosf.services.VerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,16 +22,16 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserProfileServiceImpl implements UserProfileService {
+public class UserServiceImpl implements UserService {
 
+    private final UserBankDataService userBankDataService;
     private final VerificationService verificationService;
 
     private final ClientRepository clientRepository;
-    private final ClientAccountRepository clientAccountRepository;
 
     @Override
     @Transactional
-    public <T extends RequestWithUserDataDTO> void registerNewUser(T request) {
+    public <T extends ClientRegistrationRequestDTO> void registerNewUser(T request) {
         if (clientRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             log.debug("User with email {} already exist", request.getPhoneNumber());
             return;
@@ -50,22 +50,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         if (request instanceof PreTrialAppealDTO) {
             PreTrialAppealDTO preTrialRequest = (PreTrialAppealDTO) request;
-
-            ClientAccount newClientAccount = ClientAccount.builder()
-                    .id(UUID.randomUUID().toString())
-                    .bik(preTrialRequest.getConsumerBankBik())
-                    .bankName(preTrialRequest.getConsumerBankName())
-                    .bankCorrAcc(preTrialRequest.getConsumerBankCorrAcc())
-                    .info(preTrialRequest.getConsumerInfo())
-                    .accountNumber(preTrialRequest.getCustomerAccountNumber())
-                    .client(newClient)
-                    .build();
-
-            // save user's bank data:
-            clientAccountRepository.save(newClientAccount);
-
-            // update user entity with bank data:
-            newClient.setBankData(Collections.singletonList(newClientAccount));
+            ClientBankData clientBankData = userBankDataService.saveClientBankData(preTrialRequest, newClient);
+            newClient.setBankData(Collections.singletonList(clientBankData));
         }
 
         clientRepository.save(newClient);

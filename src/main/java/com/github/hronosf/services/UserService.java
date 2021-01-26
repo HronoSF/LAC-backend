@@ -2,11 +2,11 @@ package com.github.hronosf.services;
 
 import com.github.hronosf.domain.Client;
 import com.github.hronosf.dto.request.ClientProfileActivationDTO;
-import com.github.hronosf.dto.request.RequestWithUserDataDTO;
+import com.github.hronosf.dto.request.ClientRegistrationRequestDTO;
 
-public interface UserProfileService {
+public interface UserService {
 
-    <T extends RequestWithUserDataDTO> void registerNewUser(T request);
+    <T extends ClientRegistrationRequestDTO> void registerNewUser(T request);
 
     void sendVerificationCode(String phoneNumber);
 

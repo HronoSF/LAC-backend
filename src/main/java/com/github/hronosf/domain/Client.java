@@ -28,6 +28,7 @@ public class Client {
 
     @Column(name = "last_name")
     private String lastName;
+
     private String address;
 
     @Column(name = "phone_number", unique = true)
@@ -36,7 +37,7 @@ public class Client {
     private String password;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
-    private List<ClientAccount> bankData;
+    private List<ClientBankData> bankData;
 
     @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)
     private ClientProfileVerification activationData;

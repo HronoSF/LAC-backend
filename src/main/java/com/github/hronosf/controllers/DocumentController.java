@@ -3,37 +3,36 @@ package com.github.hronosf.controllers;
 import com.github.hronosf.dto.request.PostInventoryDTO;
 import com.github.hronosf.dto.request.PreTrialAppealDTO;
 import com.github.hronosf.services.DocumentService;
-import com.github.hronosf.services.impl.UserProfileServiceImpl;
+import com.github.hronosf.services.impl.UserServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/documents")
 public class DocumentController {
 
     private final DocumentService documentService;
-    private final UserProfileServiceImpl userProfileService;
+    private final UserServiceImpl userProfileService;
 
     @ApiOperation(value = "Generation of Pre-Trial Appeal")
     @PostMapping(value = "/generate_pretrial_appeal", produces = "application/pdf")
     public HttpEntity<Resource> generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealDTO request) {
-        String pathToGenertedFile = documentService.generatePreTrialAppeal(request);
-
         if (request.isSaveUserData()) {
             userProfileService.registerNewUser(request);
         }
 
-        return new HttpEntity<>(new FileSystemResource(pathToGenertedFile));
+        return new HttpEntity<>(new FileSystemResource(documentService.generatePreTrialAppeal(request)));
     }
 
     @ApiOperation(value = "Generation of Russian Post inventory")
