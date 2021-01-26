@@ -31,7 +31,6 @@ public class UserBankDataServiceImpl implements UserBankDataService {
                 .bik(preTrialRequest.getConsumerBankBik())
                 .bankName(preTrialRequest.getConsumerBankName())
                 .bankCorrAcc(preTrialRequest.getConsumerBankCorrAcc())
-                .info(preTrialRequest.getConsumerInfo())
                 .accountNumber(preTrialRequest.getCustomerAccountNumber())
                 .client(newClient)
                 .build();

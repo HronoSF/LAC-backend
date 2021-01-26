@@ -33,9 +33,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
-    // JWT-tokens:
-    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-
     // Time parser:
     compile group: 'joda-time', name: 'joda-time', version: '2.10.6'
 
@@ -86,6 +83,9 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
     compile group: 'ch.qos.logback.contrib', name: 'logback-jackson', version: '0.1.5'
     compile group: 'ch.qos.logback.contrib', name: 'logback-json-classic', version: '0.1.5'
+
+    // Flyway:
+    compile "org.flywaydb:flyway-core"
 
 }
 

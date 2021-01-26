@@ -3,6 +3,7 @@ package com.github.hronosf.controllers;
 import com.github.hronosf.dto.request.ClientProfileActivationDTO;
 import com.github.hronosf.dto.request.ClientRegistrationRequestDTO;
 import com.github.hronosf.dto.response.ClientBankDataResponseDTO;
+import com.github.hronosf.dto.response.ClientProfileDTO;
 import com.github.hronosf.services.UserBankDataService;
 import com.github.hronosf.services.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -20,8 +21,13 @@ public class UserController {
     private final UserBankDataService userBankDataService;
 
     @PostMapping("/register")
-    public void registerNewUser(ClientRegistrationRequestDTO request) {
-        userService.registerNewUser(request);
+    public ClientProfileDTO registerNewUser(ClientRegistrationRequestDTO request) {
+        return userService.registerNewUser(request);
+    }
+
+    @GetMapping("/{id}")
+    public ClientProfileDTO getUser(@PathVariable("id") String id) {
+        return userService.getClientById(id);
     }
 
     @PostMapping("/send_code")

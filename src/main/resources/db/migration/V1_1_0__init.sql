@@ -21,7 +21,6 @@ CREATE TABLE client_bank_data
     bik            varchar(100) NOT NULL,
     bank_name      varchar(255) NOT NULL,
     bank_corr_acc  varchar(255) NOT NULL,
-    info           varchar(255) NOT NULL,
     account_number varchar(255) NOT NULL,
     created_at     TIMESTAMP DEFAULT now(),
     CONSTRAINT "pk_client_bank_data.client_account" PRIMARY KEY (id),

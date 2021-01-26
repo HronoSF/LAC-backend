@@ -3,10 +3,12 @@ package com.github.hronosf.services.impl;
 import com.github.hronosf.domain.Client;
 import com.github.hronosf.domain.ClientBankData;
 import com.github.hronosf.dto.request.ClientProfileActivationDTO;
-import com.github.hronosf.dto.request.PreTrialAppealDTO;
 import com.github.hronosf.dto.request.ClientRegistrationRequestDTO;
+import com.github.hronosf.dto.request.PreTrialAppealDTO;
+import com.github.hronosf.dto.response.ClientProfileDTO;
 import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
 import com.github.hronosf.exceptions.ClientNotFoundException;
+import com.github.hronosf.mappers.ClientMapper;
 import com.github.hronosf.repository.ClientRepository;
 import com.github.hronosf.services.UserBankDataService;
 import com.github.hronosf.services.UserService;
@@ -17,12 +19,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private final ClientMapper mapper;
 
     private final UserBankDataService userBankDataService;
     private final VerificationService verificationService;
@@ -31,10 +37,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public <T extends ClientRegistrationRequestDTO> void registerNewUser(T request) {
+    public <T extends ClientRegistrationRequestDTO> ClientProfileDTO registerNewUser(T request) {
         if (clientRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             log.debug("User with email {} already exist", request.getPhoneNumber());
-            return;
+            throw new ClientAlreadyActivatedException(request.getPhoneNumber());
         }
 
         Client newClient = Client.builder()
@@ -55,6 +61,22 @@ public class UserServiceImpl implements UserService {
         }
 
         clientRepository.save(newClient);
+
+        return mapper.toDto(newClient);
+    }
+
+    @Override
+    @Transactional
+    public ClientProfileDTO getClientById(String id) {
+        Optional<Client> clientOptional = clientRepository.findById(id);
+
+        if (clientOptional.isPresent()) {
+            Client client = clientOptional.get();
+            client.getBankData().sort(Comparator.comparing(ClientBankData::getCreatedAt));
+            return mapper.toDto(client);
+        }
+
+        throw new ClientNotFoundException(id);
     }
 
     @Override

@@ -14,7 +14,6 @@ public class ClientBankDataResponseDTO {
     private String bik;
     private String bankName;
     private String bankCorrAcc;
-    private String info;
     private String accountNumber;
     private Date createdAt;
 }

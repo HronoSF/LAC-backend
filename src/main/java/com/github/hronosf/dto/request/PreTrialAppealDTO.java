@@ -19,9 +19,6 @@ public class PreTrialAppealDTO extends ClientRegistrationRequestDTO {
 
     private String consumerBankCorrAcc;
 
-    @InnSwiftBik(message = "Некорректное значение поля INN/SWIFT/BIK, проверьте введённые данные")
-    private String consumerInfo;
-
     @Length(min = 20, max = 20, message = "Некорректное значение номера личного счёта, проверьте введённые данные")
     private String customerAccountNumber;
 

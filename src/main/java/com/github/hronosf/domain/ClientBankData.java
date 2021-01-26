@@ -24,8 +24,6 @@ public class ClientBankData {
     @Column(name = "bank_corr_acc")
     private String bankCorrAcc;
 
-    private String info;
-
     @Column(name = "account_number")
     private String accountNumber;
 

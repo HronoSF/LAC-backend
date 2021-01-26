@@ -3,6 +3,7 @@ package com.github.hronosf.services.impl;
 import com.github.hronosf.enums.Constants;
 import com.github.hronosf.services.DocumentGenerationService;
 import com.github.hronosf.services.S3ConnectorService;
+import com.github.hronosf.services.UserService;
 import de.phip1611.Docx4JSRUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
