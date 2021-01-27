@@ -1,4 +1,4 @@
-package com.github.hronosf.dto.response;
+package com.github.hronosf.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

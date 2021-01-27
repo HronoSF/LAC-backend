@@ -1,7 +1,7 @@
 package com.github.hronosf.services;
 
-import com.github.hronosf.dto.request.PostInventoryDTO;
-import com.github.hronosf.dto.request.PreTrialAppealDTO;
+import com.github.hronosf.dto.PostInventoryDTO;
+import com.github.hronosf.dto.PreTrialAppealDTO;
 
 public interface DocumentService {
 

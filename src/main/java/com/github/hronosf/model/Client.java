@@ -1,4 +1,4 @@
-package com.github.hronosf.domain;
+package com.github.hronosf.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

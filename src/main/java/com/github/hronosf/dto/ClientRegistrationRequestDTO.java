@@ -1,4 +1,4 @@
-package com.github.hronosf.dto.request;
+package com.github.hronosf.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

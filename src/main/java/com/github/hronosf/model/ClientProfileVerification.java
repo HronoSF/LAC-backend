@@ -1,6 +1,6 @@
-package com.github.hronosf.domain;
+package com.github.hronosf.model;
 
-import com.github.hronosf.enums.ActivationCodeStatus;
+import com.github.hronosf.dto.enums.ActivationCodeStatus;
 import lombok.*;
 
 import javax.persistence.*;

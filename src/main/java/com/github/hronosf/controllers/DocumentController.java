@@ -1,7 +1,7 @@
 package com.github.hronosf.controllers;
 
-import com.github.hronosf.dto.request.PostInventoryDTO;
-import com.github.hronosf.dto.request.PreTrialAppealDTO;
+import com.github.hronosf.dto.PostInventoryDTO;
+import com.github.hronosf.dto.PreTrialAppealDTO;
 import com.github.hronosf.services.DocumentService;
 import com.github.hronosf.services.impl.UserServiceImpl;
 import io.swagger.annotations.ApiOperation;

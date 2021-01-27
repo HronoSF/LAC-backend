@@ -1,7 +1,7 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.dto.request.PostInventoryDTO;
-import com.github.hronosf.dto.request.PreTrialAppealDTO;
+import com.github.hronosf.dto.PostInventoryDTO;
+import com.github.hronosf.dto.PreTrialAppealDTO;
 import com.github.hronosf.services.DocumentGenerationService;
 import com.github.hronosf.services.DocumentService;
 import lombok.RequiredArgsConstructor;

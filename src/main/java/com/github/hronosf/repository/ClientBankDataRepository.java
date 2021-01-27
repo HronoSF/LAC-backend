@@ -1,6 +1,6 @@
 package com.github.hronosf.repository;
 
-import com.github.hronosf.domain.ClientBankData;
+import com.github.hronosf.model.ClientBankData;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

@@ -1,7 +1,7 @@
 package com.github.hronosf.mappers;
 
-import com.github.hronosf.domain.ClientBankData;
-import com.github.hronosf.dto.response.ClientBankDataResponseDTO;
+import com.github.hronosf.model.ClientBankData;
+import com.github.hronosf.dto.ClientBankDataResponseDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

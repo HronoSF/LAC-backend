@@ -1,7 +1,7 @@
 package com.github.hronosf.mappers;
 
-import com.github.hronosf.domain.Client;
-import com.github.hronosf.dto.response.ClientProfileDTO;
+import com.github.hronosf.model.Client;
+import com.github.hronosf.dto.ClientProfileDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

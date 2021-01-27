@@ -1,9 +1,9 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.domain.Client;
-import com.github.hronosf.domain.ClientBankData;
-import com.github.hronosf.dto.request.PreTrialAppealDTO;
-import com.github.hronosf.dto.response.ClientBankDataResponseDTO;
+import com.github.hronosf.model.Client;
+import com.github.hronosf.model.ClientBankData;
+import com.github.hronosf.dto.PreTrialAppealDTO;
+import com.github.hronosf.dto.ClientBankDataResponseDTO;
 import com.github.hronosf.mappers.ClientAccountMapper;
 import com.github.hronosf.repository.ClientBankDataRepository;
 import com.github.hronosf.services.UserBankDataService;

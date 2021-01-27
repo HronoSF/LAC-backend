@@ -1,4 +1,4 @@
-package com.github.hronosf.enums;
+package com.github.hronosf.dto.enums;
 
 public enum ActivationCodeStatus {
 

@@ -1,8 +1,8 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.domain.Client;
-import com.github.hronosf.domain.ClientProfileVerification;
-import com.github.hronosf.enums.ActivationCodeStatus;
+import com.github.hronosf.model.Client;
+import com.github.hronosf.model.ClientProfileVerification;
+import com.github.hronosf.dto.enums.ActivationCodeStatus;
 import com.github.hronosf.exceptions.ActivationCodeNotValidException;
 import com.github.hronosf.repository.ClientAccountActivationRepository;
 import com.github.hronosf.services.VerificationService;

@@ -1,11 +1,11 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.domain.Client;
-import com.github.hronosf.domain.ClientBankData;
-import com.github.hronosf.dto.request.ClientProfileActivationDTO;
-import com.github.hronosf.dto.request.ClientRegistrationRequestDTO;
-import com.github.hronosf.dto.request.PreTrialAppealDTO;
-import com.github.hronosf.dto.response.ClientProfileDTO;
+import com.github.hronosf.model.Client;
+import com.github.hronosf.model.ClientBankData;
+import com.github.hronosf.dto.ClientProfileActivationDTO;
+import com.github.hronosf.dto.ClientRegistrationRequestDTO;
+import com.github.hronosf.dto.PreTrialAppealDTO;
+import com.github.hronosf.dto.ClientProfileDTO;
 import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
 import com.github.hronosf.exceptions.ClientAlreadyRegisteredException;
 import com.github.hronosf.exceptions.ClientNotFoundException;

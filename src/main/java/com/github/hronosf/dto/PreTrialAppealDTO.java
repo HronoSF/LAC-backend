@@ -1,4 +1,4 @@
-package com.github.hronosf.dto.request;
+package com.github.hronosf.dto;
 
 import com.github.hronosf.validation.annotations.InnSwiftBik;
 import lombok.AllArgsConstructor;

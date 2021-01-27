@@ -1,7 +1,7 @@
 package com.github.hronosf.services;
 
-import com.github.hronosf.domain.Client;
-import com.github.hronosf.domain.ClientProfileVerification;
+import com.github.hronosf.model.Client;
+import com.github.hronosf.model.ClientProfileVerification;
 
 public interface VerificationService {
 

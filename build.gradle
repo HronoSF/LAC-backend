@@ -86,7 +86,6 @@ dependencies {
 
     // Flyway:
     compile "org.flywaydb:flyway-core"
-
 }
 
 test {

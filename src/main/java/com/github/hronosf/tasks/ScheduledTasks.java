@@ -1,6 +1,6 @@
 package com.github.hronosf.tasks;
 
-import com.github.hronosf.enums.Constants;
+import com.github.hronosf.dto.enums.Constants;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;

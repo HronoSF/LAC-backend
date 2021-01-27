@@ -1,9 +1,9 @@
 package com.github.hronosf.controllers;
 
-import com.github.hronosf.dto.request.ClientProfileActivationDTO;
-import com.github.hronosf.dto.request.ClientRegistrationRequestDTO;
-import com.github.hronosf.dto.response.ClientBankDataResponseDTO;
-import com.github.hronosf.dto.response.ClientProfileDTO;
+import com.github.hronosf.dto.ClientProfileActivationDTO;
+import com.github.hronosf.dto.ClientRegistrationRequestDTO;
+import com.github.hronosf.dto.ClientBankDataResponseDTO;
+import com.github.hronosf.dto.ClientProfileDTO;
 import com.github.hronosf.services.UserBankDataService;
 import com.github.hronosf.services.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ClientProfileDTO getUser(@PathVariable("id") String id) {
+    public ClientProfileDTO getUserProfile(@PathVariable("id") String id) {
         return userService.getClientById(id);
     }
 

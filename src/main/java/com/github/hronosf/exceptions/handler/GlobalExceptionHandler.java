@@ -1,6 +1,6 @@
 package com.github.hronosf.exceptions.handler;
 
-import com.github.hronosf.dto.response.ExceptionResponseDTO;
+import com.github.hronosf.dto.ExceptionResponseDTO;
 import com.github.hronosf.exceptions.LacApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
