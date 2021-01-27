@@ -42,6 +42,12 @@ public class Client {
     @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)
     private ClientProfileVerification activationData;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_to_role",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+    private List<Role> roles;
+
     @Builder.Default
     @Column(name = "is_activated")
     private boolean isActivated = false;

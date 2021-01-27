@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,5 +17,6 @@ public class ClientProfileDTO {
     private String lastName;
     private String address;
     private String phoneNumber;
+    private List<String> roles;
     private ClientBankDataResponseDTO latestBankData;
 }

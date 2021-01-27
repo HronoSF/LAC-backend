@@ -1,9 +1,9 @@
 package com.github.hronosf.services;
 
-import com.github.hronosf.model.Client;
 import com.github.hronosf.dto.ClientProfileActivationDTO;
-import com.github.hronosf.dto.ClientRegistrationRequestDTO;
 import com.github.hronosf.dto.ClientProfileDTO;
+import com.github.hronosf.dto.ClientRegistrationRequestDTO;
+import com.github.hronosf.model.Client;
 
 public interface UserService {
 
