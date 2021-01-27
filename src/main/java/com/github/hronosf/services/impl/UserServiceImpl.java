@@ -7,6 +7,7 @@ import com.github.hronosf.dto.request.ClientRegistrationRequestDTO;
 import com.github.hronosf.dto.request.PreTrialAppealDTO;
 import com.github.hronosf.dto.response.ClientProfileDTO;
 import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
+import com.github.hronosf.exceptions.ClientAlreadyRegisteredException;
 import com.github.hronosf.exceptions.ClientNotFoundException;
 import com.github.hronosf.mappers.ClientMapper;
 import com.github.hronosf.repository.ClientRepository;
@@ -39,8 +40,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public <T extends ClientRegistrationRequestDTO> ClientProfileDTO registerNewUser(T request) {
         if (clientRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            log.debug("User with email {} already exist", request.getPhoneNumber());
-            throw new ClientAlreadyActivatedException(request.getPhoneNumber());
+            log.debug("User with phone number {} already exist", request.getPhoneNumber());
+            throw new ClientAlreadyRegisteredException(request.getPhoneNumber());
         }
 
         Client newClient = Client.builder()
@@ -76,14 +77,14 @@ public class UserServiceImpl implements UserService {
             return mapper.toDto(client);
         }
 
-        throw new ClientNotFoundException(id);
+        throw new ClientNotFoundException("id", id);
     }
 
     @Override
     public Client getByPhoneNumber(String phoneNumber) {
         return clientRepository
                 .getByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new ClientNotFoundException(phoneNumber));
+                .orElseThrow(() -> new ClientNotFoundException("номером телефона", phoneNumber));
     }
 
     @Override

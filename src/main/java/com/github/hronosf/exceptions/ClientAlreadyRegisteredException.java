@@ -6,14 +6,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class ClientAlreadyRegisteredException extends RuntimeException {
+public class ClientAlreadyRegisteredException extends LacApiException {
 
-    public static final String PROFILE_ALREADY_REGISTERED = "Client with phone number: %s already exist";
+    public static final String PROFILE_ALREADY_REGISTERED = "Клиент с указанным номером телефона: %s уже существует!";
 
     private final String phoneNumber;
 
     public ClientAlreadyRegisteredException(String phoneNumber) {
-        super(String.format(PROFILE_ALREADY_REGISTERED, phoneNumber));
+        super(String.format(PROFILE_ALREADY_REGISTERED, phoneNumber), "Профиль клиента уже существует", HttpStatus.BAD_REQUEST);
         this.phoneNumber = phoneNumber;
     }
 }

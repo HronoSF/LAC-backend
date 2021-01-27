@@ -46,4 +46,9 @@ public class UserController {
     public List<ClientBankDataResponseDTO> getClientBankData(@PathVariable("id") String id) {
         return userBankDataService.getClientBankData(id);
     }
+
+    @GetMapping("/bank_data/latest/{id}")
+    public ClientBankDataResponseDTO getLatestClientBankData(@PathVariable("id") String id) {
+        return userBankDataService.getClientLatestBankData(id);
+    }
 }

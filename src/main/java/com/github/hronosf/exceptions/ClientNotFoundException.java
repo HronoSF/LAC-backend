@@ -6,14 +6,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class ClientNotFoundException extends RuntimeException {
+public class ClientNotFoundException extends LacApiException {
 
-    public static final String PROFILE_NOT_EXIST = "Client with phone number: %s not found";
+    public static final String PROFILE_NOT_EXIST = "Клиент с указанным %s: %s не существует!";
 
-    private final String phoneNumber;
+    private final String qualifier;
 
-    public ClientNotFoundException(String phoneNumber) {
-        super(String.format(PROFILE_NOT_EXIST, phoneNumber));
-        this.phoneNumber = phoneNumber;
+    public ClientNotFoundException(String data, String qualifier) {
+        super(String.format(PROFILE_NOT_EXIST, data, qualifier), "Профиль клиента не найден", HttpStatus.NOT_FOUND);
+        this.qualifier = qualifier;
     }
 }

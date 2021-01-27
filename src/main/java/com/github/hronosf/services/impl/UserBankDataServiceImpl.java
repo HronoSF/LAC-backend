@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserBankDataServiceImpl implements UserBankDataService {
 
-    private final ClientAccountMapper clientAccountMapper;
+    private final ClientAccountMapper mapper;
     private final ClientBankDataRepository clientBankDataRepository;
 
     @Override
@@ -45,7 +46,14 @@ public class UserBankDataServiceImpl implements UserBankDataService {
                 clientId, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return clientBankData.stream()
-                .map(clientAccountMapper::toDto)
+                .map(mapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ClientBankDataResponseDTO getClientLatestBankData(String clientId) {
+        Optional<ClientBankData> clientData = clientBankDataRepository.findTopByClientIdOrderByCreatedAt(clientId);
+
+        return mapper.toDto(clientData.orElse(new ClientBankData()));
     }
 }

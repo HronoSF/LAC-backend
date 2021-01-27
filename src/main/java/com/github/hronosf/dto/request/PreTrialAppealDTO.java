@@ -12,14 +12,14 @@ import org.hibernate.validator.constraints.Length;
 public class PreTrialAppealDTO extends ClientRegistrationRequestDTO {
 
     // Consumer bank info:
-    @InnSwiftBik(message = "Некорректное значение поля INN/SWIFT/BIK, проверьте введённые данные")
+    @InnSwiftBik(message = "Некорректное значение поля INN/SWIFT/BIK")
     private String consumerBankBik;
 
     private String consumerBankName;
 
     private String consumerBankCorrAcc;
 
-    @Length(min = 20, max = 20, message = "Некорректное значение номера личного счёта, проверьте введённые данные")
+    @Length(min = 20, max = 20, message = "Некорректное значение номера личного счёта")
     private String customerAccountNumber;
 
     // Product info:
@@ -30,7 +30,7 @@ public class PreTrialAppealDTO extends ClientRegistrationRequestDTO {
     private String sellerName;
     private String sellerAddress;
 
-    @InnSwiftBik(message = "Некорректное значение поля INN продавца, проверьте введённые данные")
+    @InnSwiftBik(message = "Некорректное значение поля INN продавца")
     private String sellerINN;
 
     private boolean saveUserData;

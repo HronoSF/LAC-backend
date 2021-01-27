@@ -12,4 +12,6 @@ public interface UserBankDataService {
     ClientBankData saveClientBankData(PreTrialAppealDTO preTrialRequest, Client newClient);
 
     List<ClientBankDataResponseDTO> getClientBankData(String clientId);
+
+    ClientBankDataResponseDTO getClientLatestBankData(String clientId);
 }
