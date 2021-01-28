@@ -1,9 +1,10 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.model.Client;
-import com.github.hronosf.model.ClientProfileVerification;
 import com.github.hronosf.dto.enums.ActivationCodeStatus;
 import com.github.hronosf.exceptions.ActivationCodeNotValidException;
+import com.github.hronosf.exceptions.ActivationCodeStillValidException;
+import com.github.hronosf.model.Client;
+import com.github.hronosf.model.ClientProfileVerification;
 import com.github.hronosf.repository.ClientAccountActivationRepository;
 import com.github.hronosf.services.VerificationService;
 import com.twilio.Twilio;
@@ -34,6 +35,9 @@ public class TwilioVerificationServiceImpl implements VerificationService {
     @Value("${twilio.phone.number}")
     private String twilioPhoneNumber;
 
+    @Value("${twilio.verification.code.timeout.minutes}")
+    private int twilioVerificationCodeTimeout;
+
     private final ClientAccountActivationRepository clientAccountActivationRepository;
 
     @PostConstruct
@@ -46,13 +50,29 @@ public class TwilioVerificationServiceImpl implements VerificationService {
         int accessCode = generateVerificationCode();
 
         Date now = new Date();
-        ClientProfileVerification activationInfo = ClientProfileVerification.builder()
-                .id(UUID.randomUUID().toString())
-                .validToTimeStamp(DateUtils.addMinutes(now, 5))
-                .client(client)
-                .code(accessCode)
-                .status(ActivationCodeStatus.NEW)
-                .build();
+
+        ClientProfileVerification activationInfo;
+
+        if (client.getActivationData() != null) {
+
+            if (isVerificationTokenExpired(client.getActivationData())) {
+                activationInfo = client.getActivationData()
+                        .setCode(accessCode)
+                        .setValidToTimeStamp(DateUtils.addMinutes(now, twilioVerificationCodeTimeout))
+                        .setStatus(ActivationCodeStatus.NEW);
+            } else {
+                throw new ActivationCodeStillValidException();
+            }
+
+        } else {
+            activationInfo = ClientProfileVerification.builder()
+                    .id(UUID.randomUUID().toString())
+                    .validToTimeStamp(DateUtils.addMinutes(now, twilioVerificationCodeTimeout))
+                    .client(client)
+                    .code(accessCode)
+                    .status(ActivationCodeStatus.NEW)
+                    .build();
+        }
 
         clientAccountActivationRepository.save(activationInfo);
 
@@ -66,7 +86,7 @@ public class TwilioVerificationServiceImpl implements VerificationService {
         Message.creator(
                 new PhoneNumber(client.getPhoneNumber()),
                 new PhoneNumber(twilioPhoneNumber),
-                "Код верификации: " + accessCode
+                "Ваш код верификации: " + accessCode
         ).create();
 
         activationInfo.setSendAtTimeStamp(now);
@@ -76,14 +96,16 @@ public class TwilioVerificationServiceImpl implements VerificationService {
     }
 
     @Override
-    public void markVerificationCodeAsUsed(Client client) {
+    public void verify(Client client, int verificationCode) {
         ClientProfileVerification activationData = client.getActivationData();
 
         if (activationData.getStatus().equals(ActivationCodeStatus.NEW) &&
-                activationData.getValidToTimeStamp().compareTo(new Date()) >= 0) {
+                !isVerificationTokenExpired(activationData) &&
+                client.getActivationData().getCode() == verificationCode) {
 
             activationData.setStatus(ActivationCodeStatus.USED);
             clientAccountActivationRepository.save(activationData);
+
         } else {
             throw new ActivationCodeNotValidException();
         }
@@ -92,5 +114,9 @@ public class TwilioVerificationServiceImpl implements VerificationService {
     @Override
     public int generateVerificationCode() {
         return 1000 + new Random().nextInt(9000);
+    }
+
+    private boolean isVerificationTokenExpired(ClientProfileVerification activationData) {
+        return activationData.getValidToTimeStamp().compareTo(new Date()) < 0;
     }
 }

@@ -1,31 +1,61 @@
 package com.github.hronosf.configs;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.net.URI;
 
 @Configuration
-@EnableSwagger2
-public class SwaggerConfiguration extends WebMvcConfigurationSupport {
+public class SwaggerConfiguration implements WebMvcConfigurer {
+
+    @Value("${security.authorization-endpoint}")
+    private URI authEndpoint;
+
+    @Value("${security.token-endpoint}")
+    private URI tokenEndpoint;
+
+    private static final String OAUTH_SCHEMA = "OAuth";
+    private static final String HTTP_SCHEMA = "Access token";
 
     @Bean
-    public Docket swagger() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.github.hronosf"))
-                .paths(PathSelectors.any())
-                .build();
+    public OpenAPI openApi() {
+        return new OpenAPI()
+                .addSecurityItem(new SecurityRequirement()
+                        .addList(OAUTH_SCHEMA)
+                        .addList(HTTP_SCHEMA))
+                .components(new Components()
+                        .addSecuritySchemes(OAUTH_SCHEMA, oauthSecuritySchema())
+                        .addSecuritySchemes(HTTP_SCHEMA, httpScheme()));
     }
 
     @Override
-    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/ui/**")
+                .addResourceLocations("classpath:/META-INF/resources/ui/");
+    }
+
+    private SecurityScheme oauthSecuritySchema() {
+        return new SecurityScheme()
+                .type(SecurityScheme.Type.OAUTH2)
+                .flows(new OAuthFlows()
+                        .implicit(new OAuthFlow()
+                                .authorizationUrl(authEndpoint.toString())
+                                .tokenUrl(tokenEndpoint.toString())));
+    }
+
+    private SecurityScheme httpScheme() {
+        return new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT");
     }
 }

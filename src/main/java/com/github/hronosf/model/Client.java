@@ -34,8 +34,6 @@ public class Client {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
-    private String password;
-
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private List<ClientBankData> bankData;
 

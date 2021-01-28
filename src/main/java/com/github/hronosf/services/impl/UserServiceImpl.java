@@ -1,8 +1,10 @@
 package com.github.hronosf.services.impl;
 
+import com.github.hronosf.authentication.providers.UserProvider;
 import com.github.hronosf.dto.ClientProfileActivationDTO;
 import com.github.hronosf.dto.ClientProfileDTO;
 import com.github.hronosf.dto.ClientRegistrationRequestDTO;
+import com.github.hronosf.dto.PreTrialAppealDTO;
 import com.github.hronosf.dto.enums.Roles;
 import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
 import com.github.hronosf.exceptions.ClientAlreadyRegisteredException;
@@ -38,6 +40,8 @@ public class UserServiceImpl implements UserService {
 
     private final ClientMapper mapper;
 
+    private final UserProvider userProvider;
+
     private final CognitoService cognitoService;
     private final UserBankDataService userBankDataService;
     private final VerificationService verificationService;
@@ -51,41 +55,56 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public <T extends ClientRegistrationRequestDTO> ClientProfileDTO registerNewUser(T request) {
-        if (clientRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            log.debug("User with phone number {} already exist", request.getPhoneNumber());
-            throw new ClientAlreadyRegisteredException(request.getPhoneNumber());
+    @Transactional(rollbackFor = Exception.class)
+    public <T extends ClientRegistrationRequestDTO> ClientProfileDTO registerNewUser(T request, boolean isActivate) {
+        Client client;
+
+        Optional<Client> clientOpt = clientRepository.findByPhoneNumber(request.getPhoneNumber());
+
+        if (clientOpt.isPresent()) {
+            client = clientOpt.get();
+
+            if (client.isActivated()) {
+                log.debug("User with phone number {} already exist", request.getPhoneNumber());
+                throw new ClientAlreadyRegisteredException(request.getPhoneNumber());
+            }
+
+        } else {
+            // Save new client to app-db:
+            client = Client.builder()
+                    .id(UUID.randomUUID().toString())
+                    .firstName(request.getFirstName())
+                    .middleName(request.getMiddleName())
+                    .lastName(request.getLastName())
+                    .address(request.getAddress())
+                    .roles(Collections.singletonList(clientRole))
+                    .phoneNumber(request.getPhoneNumber())
+                    .build();
+
+            clientRepository.save(client);
+
+            // create account in cognito:
+            cognitoService.createUser(
+                    request.getPhoneNumber(),
+                    StringUtils.isNotBlank(request.getPassword()) ?
+                            request.getPassword() : "tmpPassword" + UUID.randomUUID(),
+                    StringUtils.substringAfter(Roles.CLIENT.getName(), Roles.getPrefix())
+            );
         }
 
-        // Save client to app-db:
-        Client newClient = Client.builder()
-                .id(UUID.randomUUID().toString())
-                .firstName(request.getFirstName())
-                .middleName(request.getMiddleName())
-                .lastName(request.getLastName())
-                .address(request.getAddress())
-                .roles(Collections.singletonList(clientRole))
-                .phoneNumber(request.getPhoneNumber())
-                .build();
+        if (isActivate) {
+            // send verificationCode:
+            sendVerificationCode(request.getPhoneNumber());
+        }
 
-        clientRepository.save(newClient);
-
-        // create account in cognito:
-        cognitoService.createUser(
-                request.getPhoneNumber(), request.getPassword(),
-                StringUtils.substringAfter(Roles.CLIENT.getName(), Roles.getPrefix()).toUpperCase()
-        );
-
-        // send verificationCode:
-        sendVerificationCode(request.getPhoneNumber());
-
-        return mapper.toDto(newClient);
+        return mapper.toDto(client);
     }
 
     @Override
     @Transactional
-    public ClientProfileDTO getClientById(String id) {
+    public ClientProfileDTO getAuthenticatedClient() {
+        String id = userProvider.getAuthenticatedUser().getId();
+
         Optional<Client> clientOptional = clientRepository.findById(id);
 
         if (clientOptional.isPresent()) {
@@ -100,7 +119,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Client getByPhoneNumber(String phoneNumber) {
         return clientRepository
-                .getByPhoneNumber(phoneNumber)
+                .findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new ClientNotFoundException("номером телефона", phoneNumber));
     }
 
@@ -115,10 +134,24 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void activateClientProfile(ClientProfileActivationDTO request) {
         Client client = getClientIfNotActivated(request.getPhoneNumber());
-        verificationService.markVerificationCodeAsUsed(client);
+
+        verificationService.verify(client, request.getVerificationCode());
 
         client.setActivated(true);
         clientRepository.save(client);
+    }
+
+    @Override
+    public void createUserIfNotExistAndAddUserBankData(PreTrialAppealDTO request) {
+        Client client;
+        try {
+            client = getByPhoneNumber(request.getPhoneNumber());
+        } catch (ClientNotFoundException exception) {
+            registerNewUser(request, false);
+            client = getByPhoneNumber(request.getPhoneNumber());
+        }
+
+        userBankDataService.saveClientBankData(request, client);
     }
 
     private Client getClientIfNotActivated(String phoneNumber) {

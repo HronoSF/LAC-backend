@@ -7,7 +7,7 @@ public interface VerificationService {
 
     ClientProfileVerification sendVerificationCode(Client client);
 
-    void markVerificationCodeAsUsed(Client client);
+    void verify(Client client, int verificationCode);
 
     int generateVerificationCode();
 }

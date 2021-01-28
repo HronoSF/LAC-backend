@@ -6,8 +6,8 @@ CREATE TABLE role
 );
 
 INSERT INTO role(id, name)
-VALUES (md5(random()::text || clock_timestamp()::text)::uuid, 'ROLE_client'),
-       (md5(random()::text || clock_timestamp()::text)::uuid, 'ROLE_admin');
+VALUES (md5(random()::text || clock_timestamp()::text)::uuid, 'ROLE_CLIENT'),
+       (md5(random()::text || clock_timestamp()::text)::uuid, 'ROLE_ADMIN');
 
 CREATE TABLE user_to_role
 (

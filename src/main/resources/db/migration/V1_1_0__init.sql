@@ -6,7 +6,6 @@ CREATE TABLE client_data
     middle_name       varchar(255),
     address           varchar(1024),
     phone_number      varchar(255) NOT NULL,
-    password          varchar(255),
     is_activated      bool                  DEFAULT FALSE,
     registration_date TIMESTAMP    NOT NULL DEFAULT now(),
     update_at         TIMESTAMP    NOT NULL DEFAULT now(),
