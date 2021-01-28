@@ -17,7 +17,7 @@ public interface ClientMapper {
     ClientAccountMapper BANK_DATA_MAPPER = Mappers.getMapper(ClientAccountMapper.class);
 
     @Mapping(target = "latestBankData",
-            expression = "java(client.getBankData().isEmpty()? null: BANK_DATA_MAPPER.toDto(client.getBankData().get(0)))")
+            expression = "java(client.getBankData() == null || client.getBankData().isEmpty() ? null : BANK_DATA_MAPPER.toDto(client.getBankData().get(0)))")
     @Mapping(target = "roles",
             expression = "java(client.getRoles().stream().map(Role::getName).collect(Collectors.toList()))")
     ClientProfileDTO toDto(Client client);

@@ -41,6 +41,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(responseDTO, e.getStatus());
     }
 
+    @ExceptionHandler(value = Throwable.class)
+    public ResponseEntity<ExceptionResponseDTO> anyException(Throwable e) {
+        ExceptionResponseDTO responseDTO = new ExceptionResponseDTO()
+                .setTitle("Что-то пошло не так, пожалуйста, сделайте скриншот и пришлите нам на email")
+                .setDetails(e.getMessage());
+
+        log.debug("Exception {} handled: {}", e.getClass(), e.getMessage());
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,

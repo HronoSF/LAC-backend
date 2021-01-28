@@ -7,7 +7,5 @@ import java.util.Optional;
 
 public interface ClientRepository extends CrudRepository<Client, String> {
 
-    boolean existsByPhoneNumber(String phoneNumber);
-
-    Optional<Client> getByPhoneNumber(String phoneNumber);
+    Optional<Client> findByPhoneNumber(String phoneNumber);
 }

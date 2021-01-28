@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Roles {
 
-    CLIENT("ROLE_client"),
-    ADMIN("ROLE_admin");
+    CLIENT("ROLE_CLIENT"),
+    ADMIN("ROLE_ADMIN");
 
     public static String getPrefix() {
         return "ROLE_";
