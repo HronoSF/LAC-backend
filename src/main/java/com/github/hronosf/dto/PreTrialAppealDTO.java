@@ -32,6 +32,4 @@ public class PreTrialAppealDTO extends ClientRegistrationRequestDTO {
 
     @InnSwiftBik(message = "Некорректное значение поля INN продавца")
     private String sellerINN;
-
-    private boolean saveUserData;
 }

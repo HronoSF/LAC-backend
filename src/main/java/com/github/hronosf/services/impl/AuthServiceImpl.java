@@ -3,6 +3,7 @@ package com.github.hronosf.services.impl;
 import com.github.hronosf.dto.TokenResponse;
 import com.github.hronosf.services.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
@@ -73,7 +74,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<Cookie> deleteCookies() {
-        TokenResponse tokenResponse = new TokenResponse("", "", "", 0, "");
+        TokenResponse tokenResponse = new TokenResponse(
+                StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, 0, StringUtils.EMPTY);
+
         return createCookie(tokenResponse, 0);
     }
 

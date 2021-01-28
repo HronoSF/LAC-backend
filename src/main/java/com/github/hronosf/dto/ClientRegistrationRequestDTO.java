@@ -15,4 +15,5 @@ public class ClientRegistrationRequestDTO {
     protected String lastName;
     protected String address;
     protected String phoneNumber;
+    protected String password;
 }

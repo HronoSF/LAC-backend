@@ -2,7 +2,7 @@ package com.github.hronosf.services.impl;
 
 import com.github.hronosf.dto.enums.Constants;
 import com.github.hronosf.services.DocumentGenerationService;
-import com.github.hronosf.services.S3ConnectorService;
+import com.github.hronosf.services.S3Service;
 import de.phip1611.Docx4JSRUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,7 +27,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DocumentGenerationServiceImpl implements DocumentGenerationService {
 
-    private final S3ConnectorService s3ConnectorService;
+    private final S3Service s3Service;
     private Map<String, WordprocessingMLPackage> loadedTemplates;
 
     @SneakyThrows
@@ -111,7 +111,7 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         String keyName = StringUtils.substringBetween(path, "generatedDocuments" + File.separator, "_") + "/";
         String pathToFileInBucket = StringUtils.substringAfter(path, "generatedDocuments" + File.separator);
 
-        s3ConnectorService.uploadFileToS3(keyName + pathToFileInBucket, path, s3ConnectorService.getS3BucketName());
+        s3Service.uploadFileToS3(keyName + pathToFileInBucket, path, s3Service.getS3BucketName());
     }
 
     @SuppressWarnings("java:S5361")

@@ -4,12 +4,12 @@ CREATE TABLE client_data
     first_name        varchar(255),
     last_name         varchar(255),
     middle_name       varchar(255),
-    address           varchar(1024) NOT NULL,
-    phone_number      varchar(255)  NOT NULL,
+    address           varchar(1024),
+    phone_number      varchar(255) NOT NULL,
     password          varchar(255),
-    is_activated      bool                   DEFAULT FALSE,
-    registration_date TIMESTAMP     NOT NULL DEFAULT now(),
-    update_at         TIMESTAMP     NOT NULL DEFAULT now(),
+    is_activated      bool                  DEFAULT FALSE,
+    registration_date TIMESTAMP    NOT NULL DEFAULT now(),
+    update_at         TIMESTAMP    NOT NULL DEFAULT now(),
     CONSTRAINT "pk_client_data.client_data" PRIMARY KEY (id),
     UNIQUE (phone_number)
 );

@@ -58,9 +58,10 @@ dependencies {
 
     // Amazon's SDK:
     compile 'com.amazonaws:aws-java-sdk-s3'
-    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.228'
-    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.524'
-    compile group: 'com.amazonaws', name: 'aws-java-sdk-logs', version: '1.11.524'
+    compile "com.amazonaws:aws-java-sdk-cognitoidp:1.11.897"
+    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.897'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-logs', version: '1.11.897'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.897'
 
     // Swagger:
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'

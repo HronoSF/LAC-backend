@@ -10,7 +10,9 @@ public enum Roles {
     CLIENT("ROLE_client"),
     ADMIN("ROLE_admin");
 
-    private static final String prefix = "ROLE";
+    public static String getPrefix() {
+        return "ROLE_";
+    }
 
     private final String name;
 }

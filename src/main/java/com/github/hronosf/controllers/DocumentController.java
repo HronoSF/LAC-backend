@@ -27,10 +27,6 @@ public class DocumentController {
     @ApiOperation(value = "Generation of Pre-Trial Appeal")
     @PostMapping(value = "/generate_pretrial_appeal", produces = "application/pdf")
     public HttpEntity<Resource> generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealDTO request) {
-        if (request.isSaveUserData()) {
-            userProfileService.registerNewUser(request);
-        }
-
         return new HttpEntity<>(new FileSystemResource(documentService.generatePreTrialAppeal(request)));
     }
 

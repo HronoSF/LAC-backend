@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.github.hronosf.services.S3ConnectorService;
+import com.github.hronosf.services.S3Service;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.io.File;
 @Slf4j
 @Getter
 @Service
-public class S3ConnectorServiceImpl implements S3ConnectorService {
+public class S3ServiceImpl implements S3Service {
 
     @Setter(onMethod = @__(@Autowired))
     private AmazonS3 s3Client;

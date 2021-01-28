@@ -3,7 +3,6 @@ package com.github.hronosf.services.impl;
 import com.github.hronosf.dto.ClientProfileActivationDTO;
 import com.github.hronosf.dto.ClientProfileDTO;
 import com.github.hronosf.dto.ClientRegistrationRequestDTO;
-import com.github.hronosf.dto.PreTrialAppealDTO;
 import com.github.hronosf.dto.enums.Roles;
 import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
 import com.github.hronosf.exceptions.ClientAlreadyRegisteredException;
@@ -14,11 +13,13 @@ import com.github.hronosf.model.ClientBankData;
 import com.github.hronosf.model.Role;
 import com.github.hronosf.repository.ClientRepository;
 import com.github.hronosf.repository.RoleRepository;
+import com.github.hronosf.services.CognitoService;
 import com.github.hronosf.services.UserBankDataService;
 import com.github.hronosf.services.UserService;
 import com.github.hronosf.services.VerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class UserServiceImpl implements UserService {
 
     private final ClientMapper mapper;
 
+    private final CognitoService cognitoService;
     private final UserBankDataService userBankDataService;
     private final VerificationService verificationService;
 
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
             throw new ClientAlreadyRegisteredException(request.getPhoneNumber());
         }
 
+        // Save client to app-db:
         Client newClient = Client.builder()
                 .id(UUID.randomUUID().toString())
                 .firstName(request.getFirstName())
@@ -68,13 +71,14 @@ public class UserServiceImpl implements UserService {
 
         clientRepository.save(newClient);
 
-        if (request instanceof PreTrialAppealDTO) {
-            PreTrialAppealDTO preTrialRequest = (PreTrialAppealDTO) request;
-            ClientBankData clientBankData = userBankDataService.saveClientBankData(preTrialRequest, newClient);
-            newClient.setBankData(Collections.singletonList(clientBankData));
-        }
+        // create account in cognito:
+        cognitoService.createUser(
+                request.getPhoneNumber(), request.getPassword(),
+                StringUtils.substringAfter(Roles.CLIENT.getName(), Roles.getPrefix()).toUpperCase()
+        );
 
-        clientRepository.save(newClient);
+        // send verificationCode:
+        sendVerificationCode(request.getPhoneNumber());
 
         return mapper.toDto(newClient);
     }
