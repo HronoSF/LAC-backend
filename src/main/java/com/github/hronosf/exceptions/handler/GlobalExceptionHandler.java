@@ -47,7 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .setTitle("Что-то пошло не так, пожалуйста, сделайте скриншот и пришлите нам на email")
                 .setDetails(e.getMessage());
 
-        log.debug("Exception {} handled: {}", e.getClass(), e.getMessage());
+        log.debug("Exception {} handled: {}\nStack trace:\n{}", e.getClass(), e.getMessage(), e.getStackTrace());
 
         return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -18,9 +18,13 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -56,9 +60,9 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
 
     @Override
     @SneakyThrows
-    public String generatePretrialAppeal(Map<String, String> mappings) {
+    public String generatePretrialAppeal(Map<String, String> mappings, String clientId) {
         // fill generate docx with user data:
-        final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"));
+        final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"), clientId);
 
         // generate file name:
         String pdf = buildFileName(mappings.get("CONSUMER"), "pre-trial-appeal", ".pdf");
@@ -77,18 +81,18 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         log.debug("Generated {} file", pdf);
 
         // upload to S3:
-        uploadGeneratedDocumentToS3(pdf);
+        uploadGeneratedDocumentToS3(pdf, clientId);
 
         return pdf;
     }
 
     @Override
     @SneakyThrows
-    public String generatePostInventory(Map<String, String> mappings) {
-        return fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("post_inventory"));
+    public String generatePostInventory(Map<String, String> mappings, String clientId) {
+        return fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("post_inventory"), clientId);
     }
 
-    private String fillUserDataAndGenerateDocx(Map<String, String> mappings, WordprocessingMLPackage wordMLPackage)
+    private String fillUserDataAndGenerateDocx(Map<String, String> mappings, WordprocessingMLPackage wordMLPackage, String clientId)
             throws Docx4JException, IOException {
         // replace variables in template:
         Docx4JSRUtil.searchAndReplace(wordMLPackage, mappings);
@@ -102,13 +106,13 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
         log.debug("Generated {} file", docx);
 
         // upload to S3:
-        uploadGeneratedDocumentToS3(docx);
+        uploadGeneratedDocumentToS3(docx, clientId);
 
         return docx;
     }
 
-    private void uploadGeneratedDocumentToS3(String path) {
-        String keyName = StringUtils.substringBetween(path, "generatedDocuments" + File.separator, "_") + "/";
+    private void uploadGeneratedDocumentToS3(String path, String clientId) {
+        String keyName = clientId + "/";
         String pathToFileInBucket = StringUtils.substringAfter(path, "generatedDocuments" + File.separator);
 
         s3Service.uploadFileToS3(keyName + pathToFileInBucket, path, s3Service.getS3BucketName());
@@ -116,14 +120,14 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
 
     @SuppressWarnings("java:S5361")
     public String buildFileName(String name, String type, String extension) {
-        return String
-                .format("%s%s%s_%s_%s_%s%s"
+        return new String(
+                String.format("%s%s%s_%s_%s%s"
                         , Constants.PATH.getValue().toAbsolutePath().toString()
                         , File.separator
                         , new String(name.replaceAll(StringUtils.SPACE, "-").getBytes(), Charset.defaultCharset())
                         , type
-                        , new SimpleDateFormat("dd_MM_yyyy").format(new Date())
-                        , UUID.randomUUID().toString().substring(0, 15)
-                        , extension);
+                        , new SimpleDateFormat("dd_MM_yyyy_ssss").format(new Date())
+                        , extension).getBytes(),
+                StandardCharsets.UTF_8);
     }
 }

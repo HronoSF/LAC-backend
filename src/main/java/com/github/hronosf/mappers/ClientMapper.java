@@ -1,6 +1,6 @@
 package com.github.hronosf.mappers;
 
-import com.github.hronosf.dto.ClientProfileDTO;
+import com.github.hronosf.dto.ClientProfileResponseDTO;
 import com.github.hronosf.model.Client;
 import com.github.hronosf.model.Role;
 import org.mapstruct.Mapper;
@@ -20,5 +20,5 @@ public interface ClientMapper {
             expression = "java(client.getBankData() == null || client.getBankData().isEmpty() ? null : BANK_DATA_MAPPER.toDto(client.getBankData().get(0)))")
     @Mapping(target = "roles",
             expression = "java(client.getRoles().stream().map(Role::getName).collect(Collectors.toList()))")
-    ClientProfileDTO toDto(Client client);
+    ClientProfileResponseDTO toDto(Client client);
 }

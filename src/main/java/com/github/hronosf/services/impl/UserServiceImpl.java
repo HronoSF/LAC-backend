@@ -1,17 +1,13 @@
 package com.github.hronosf.services.impl;
 
 import com.github.hronosf.authentication.providers.UserProvider;
-import com.github.hronosf.dto.ClientProfileActivationDTO;
-import com.github.hronosf.dto.ClientProfileDTO;
-import com.github.hronosf.dto.ClientRegistrationRequestDTO;
-import com.github.hronosf.dto.PreTrialAppealDTO;
+import com.github.hronosf.dto.*;
 import com.github.hronosf.dto.enums.Roles;
 import com.github.hronosf.exceptions.ClientAlreadyActivatedException;
 import com.github.hronosf.exceptions.ClientAlreadyRegisteredException;
 import com.github.hronosf.exceptions.ClientNotFoundException;
 import com.github.hronosf.mappers.ClientMapper;
 import com.github.hronosf.model.Client;
-import com.github.hronosf.model.ClientBankData;
 import com.github.hronosf.model.Role;
 import com.github.hronosf.repository.ClientRepository;
 import com.github.hronosf.repository.RoleRepository;
@@ -26,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -56,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public <T extends ClientRegistrationRequestDTO> ClientProfileDTO registerNewUser(T request, boolean isActivate) {
+    public <T extends ClientRegistrationRequestDTO> ClientProfileResponseDTO registerNewUser(T request, boolean isActivate) {
         Client client;
 
         Optional<Client> clientOpt = clientRepository.findByPhoneNumber(request.getPhoneNumber());
@@ -77,7 +70,7 @@ public class UserServiceImpl implements UserService {
                     .middleName(request.getMiddleName())
                     .lastName(request.getLastName())
                     .address(request.getAddress())
-                    .roles(Collections.singletonList(clientRole))
+                    .roles(new LinkedHashSet<>(Collections.singleton(clientRole)))
                     .phoneNumber(request.getPhoneNumber())
                     .build();
 
@@ -101,19 +94,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public ClientProfileDTO getAuthenticatedClient() {
-        String id = userProvider.getAuthenticatedUser().getId();
+    public ClientProfileResponseDTO updateClientPersonalData(ClientProfileUpdateRequestDTO request) {
+        Client client = userProvider.getAuthenticatedUser();
 
-        Optional<Client> clientOptional = clientRepository.findById(id);
-
-        if (clientOptional.isPresent()) {
-            Client client = clientOptional.get();
-            client.getBankData().sort(Comparator.comparing(ClientBankData::getCreatedAt));
-            return mapper.toDto(client);
+        if (StringUtils.isNotBlank(request.getFirstName())) {
+            client.setFirstName(request.getFirstName());
         }
 
-        throw new ClientNotFoundException("id", id);
+        if (StringUtils.isNotBlank(request.getMiddleName())) {
+            client.setMiddleName(request.getMiddleName());
+        }
+
+        if (StringUtils.isNotBlank(request.getLastName())) {
+            client.setLastName(request.getLastName());
+        }
+
+        if (StringUtils.isNotBlank(request.getAddress())) {
+            client.setAddress(request.getAddress());
+        }
+
+        client.setUpdatedAtDate(new Date());
+        clientRepository.save(client);
+
+        return mapper.toDto(client);
+    }
+
+    @Override
+    public ClientProfileResponseDTO getAuthenticatedClient() {
+        Client client = userProvider.getAuthenticatedUser();
+        return mapper.toDto(client);
     }
 
     @Override
@@ -132,7 +141,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void activateClientProfile(ClientProfileActivationDTO request) {
+    public void activateClientProfile(ClientProfileActivationRequestDTO request) {
         Client client = getClientIfNotActivated(request.getPhoneNumber());
 
         verificationService.verify(client, request.getVerificationCode());
@@ -142,7 +151,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createUserIfNotExistAndAddUserBankData(PreTrialAppealDTO request) {
+    public void createUserIfNotExistAndAddUserBankData(PreTrialAppealRequestDTO request) {
         Client client;
         try {
             client = getByPhoneNumber(request.getPhoneNumber());

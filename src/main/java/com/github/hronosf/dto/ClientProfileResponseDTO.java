@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientProfileDTO {
+public class ClientProfileResponseDTO {
 
     private String id;
     private String firstName;

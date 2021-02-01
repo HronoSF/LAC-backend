@@ -24,7 +24,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 @SpringBootConfiguration
 @Import(AuthenticationProvider.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class NewSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${security.white.list}")
     private String[] whiteList;

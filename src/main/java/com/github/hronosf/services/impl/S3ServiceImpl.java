@@ -4,18 +4,23 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.github.hronosf.dto.DocumentDataResponseDTO;
 import com.github.hronosf.services.S3Service;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -36,6 +41,7 @@ public class S3ServiceImpl implements S3Service {
         }
     }
 
+    @Override
     public void uploadFileToS3(String keyName, String filePath, String bucketName) {
         log.debug("Uploading generated doc to S3 to bucket:{} with path:{}"
                 , bucketName
@@ -45,8 +51,22 @@ public class S3ServiceImpl implements S3Service {
         transferManager.upload(bucketName, keyName, new File(filePath));
     }
 
-    public S3Object getFileFromS3(String bucketName, String key) {
-        log.debug("Downloading an object");
-        return s3Client.getObject(new GetObjectRequest(bucketName, key));
+    @Override
+    public S3Object getFileFromS3(String key) {
+        log.debug("Downloading an object {}/{}", s3BucketName, key);
+        return s3Client.getObject(new GetObjectRequest(s3BucketName, key));
+    }
+
+    @Override
+    public List<DocumentDataResponseDTO> listS3bucket(String prefix) {
+        List<S3ObjectSummary> files = s3Client.listObjects(s3BucketName, prefix).getObjectSummaries();
+
+        return files.stream().map(objSummary ->
+                new DocumentDataResponseDTO(
+                        StringUtils.substringAfter(objSummary.getKey(), prefix + "/"),
+                        s3Client.getUrl(s3BucketName, objSummary.getKey()).toString(),
+                        objSummary.getLastModified()
+                )
+        ).collect(Collectors.toList());
     }
 }

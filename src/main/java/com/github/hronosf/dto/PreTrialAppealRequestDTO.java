@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PreTrialAppealDTO extends ClientRegistrationRequestDTO {
+public class PreTrialAppealRequestDTO extends ClientRegistrationRequestDTO {
 
     // Consumer bank info:
     @NotNull

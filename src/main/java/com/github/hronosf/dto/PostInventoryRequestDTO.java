@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostInventoryDTO {
+public class PostInventoryRequestDTO {
 
     @NotNull
     private String consumerName;
@@ -19,4 +19,7 @@ public class PostInventoryDTO {
 
     @NotNull
     private String sellerAddress;
+
+    @NotNull
+    private String phoneNumber;
 }

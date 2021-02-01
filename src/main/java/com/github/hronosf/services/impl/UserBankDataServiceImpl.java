@@ -2,7 +2,7 @@ package com.github.hronosf.services.impl;
 
 import com.github.hronosf.authentication.providers.UserProvider;
 import com.github.hronosf.dto.ClientBankDataResponseDTO;
-import com.github.hronosf.dto.PreTrialAppealDTO;
+import com.github.hronosf.dto.PreTrialAppealRequestDTO;
 import com.github.hronosf.mappers.ClientAccountMapper;
 import com.github.hronosf.model.Client;
 import com.github.hronosf.model.ClientBankData;
@@ -29,7 +29,7 @@ public class UserBankDataServiceImpl implements UserBankDataService {
     private final ClientBankDataRepository clientBankDataRepository;
 
     @Override
-    public ClientBankData saveClientBankData(PreTrialAppealDTO preTrialRequest, Client newClient) {
+    public ClientBankData saveClientBankData(PreTrialAppealRequestDTO preTrialRequest, Client newClient) {
         ClientBankData newClientBankData = ClientBankData.builder()
                 .id(UUID.randomUUID().toString())
                 .bik(preTrialRequest.getConsumerBankBik())

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientProfileActivationDTO {
+public class ClientProfileActivationRequestDTO {
 
     private String phoneNumber;
     private int verificationCode;

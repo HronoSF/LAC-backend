@@ -1,9 +1,13 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.dto.PostInventoryDTO;
-import com.github.hronosf.dto.PreTrialAppealDTO;
+import com.github.hronosf.authentication.providers.UserProvider;
+import com.github.hronosf.dto.DocumentDataResponseDTO;
+import com.github.hronosf.dto.PostInventoryRequestDTO;
+import com.github.hronosf.dto.PreTrialAppealRequestDTO;
 import com.github.hronosf.services.DocumentGenerationService;
 import com.github.hronosf.services.DocumentService;
+import com.github.hronosf.services.S3Service;
+import com.github.hronosf.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormat;
@@ -12,15 +16,21 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
 
+    private final UserProvider userProvider;
+
+    private final S3Service s3Service;
+    private final UserService userService;
     private final DocumentGenerationService documentGenerationService;
 
-    public String generatePreTrialAppeal(PreTrialAppealDTO request) {
+    @Override
+    public String generatePreTrialAppeal(PreTrialAppealRequestDTO request) {
         Map<String, String> consumerAndSellerData = new HashMap<>();
 
         // seller's data:
@@ -57,10 +67,14 @@ public class DocumentServiceImpl implements DocumentService {
         // date:
         consumerAndSellerData.put("CLAIMDATA", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
 
-        return documentGenerationService.generatePretrialAppeal(consumerAndSellerData);
+        return documentGenerationService.generatePretrialAppeal(
+                consumerAndSellerData,
+                userService.getByPhoneNumber(request.getPhoneNumber()).getId()
+        );
     }
 
-    public String generatePostInventory(PostInventoryDTO request) {
+    @Override
+    public String generatePostInventory(PostInventoryRequestDTO request) {
         Map<String, String> sellerData = new HashMap<>();
 
         // seller's data:
@@ -68,7 +82,17 @@ public class DocumentServiceImpl implements DocumentService {
         sellerData.put("SELLER", request.getSellerName());
         sellerData.put("SELADR", request.getSellerAddress());
 
-        return documentGenerationService.generatePostInventory(sellerData);
+        return documentGenerationService.generatePostInventory(
+                sellerData,
+                userService.getByPhoneNumber(request.getPhoneNumber()).getId()
+        );
+    }
+
+    @Override
+    public List<DocumentDataResponseDTO> listS3bucket() {
+        String client = userProvider.getAuthenticatedUser().getId();
+
+        return s3Service.listS3bucket(client);
     }
 }
 

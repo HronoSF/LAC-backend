@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -15,6 +16,10 @@ import java.util.List;
 @Table(name = "client_data")
 @NoArgsConstructor
 @AllArgsConstructor
+@NamedEntityGraph(
+        name = "Client.detailed_with_bank_data", attributeNodes = {
+        @NamedAttributeNode("bankData"), @NamedAttributeNode("roles")}
+)
 public class Client {
 
     @Id
@@ -44,7 +49,7 @@ public class Client {
     @JoinTable(name = "user_to_role",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private List<Role> roles;
+    private Set<Role> roles;
 
     @Builder.Default
     @Column(name = "is_activated")

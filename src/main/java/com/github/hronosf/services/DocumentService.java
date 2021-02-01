@@ -1,11 +1,16 @@
 package com.github.hronosf.services;
 
-import com.github.hronosf.dto.PostInventoryDTO;
-import com.github.hronosf.dto.PreTrialAppealDTO;
+import com.github.hronosf.dto.DocumentDataResponseDTO;
+import com.github.hronosf.dto.PostInventoryRequestDTO;
+import com.github.hronosf.dto.PreTrialAppealRequestDTO;
+
+import java.util.List;
 
 public interface DocumentService {
 
-    String generatePreTrialAppeal(PreTrialAppealDTO request);
+    String generatePreTrialAppeal(PreTrialAppealRequestDTO request);
 
-    String generatePostInventory(PostInventoryDTO request);
+    String generatePostInventory(PostInventoryRequestDTO request);
+
+    List<DocumentDataResponseDTO> listS3bucket();
 }

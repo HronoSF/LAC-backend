@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -11,10 +12,15 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ClientRegistrationRequestDTO {
 
-    // Common info about consumer:
+    @NotBlank
     protected String firstName;
+
     protected String middleName;
+
+    @NotBlank
     protected String lastName;
+
+    @NotBlank
     protected String address;
 
     @NotNull
