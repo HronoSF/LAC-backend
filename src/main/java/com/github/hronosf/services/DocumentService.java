@@ -12,5 +12,5 @@ public interface DocumentService {
 
     String generatePostInventory(PostInventoryRequestDTO request);
 
-    List<DocumentDataResponseDTO> listS3bucket();
+    List<DocumentDataResponseDTO> getAllDocumentsData();
 }

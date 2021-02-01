@@ -40,7 +40,7 @@ public class DocumentController {
     @GetMapping("/get_all")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get links to all authenticated user documents")
-    public List<DocumentDataResponseDTO> listDocumnetsOfAuthenticatedClient() {
-        return documentService.listS3bucket();
+    public List<DocumentDataResponseDTO> listDocumentsOfAuthenticatedClient() {
+        return documentService.getAllDocumentsData();
     }
 }

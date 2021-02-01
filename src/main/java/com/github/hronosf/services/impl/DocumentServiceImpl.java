@@ -89,10 +89,10 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentDataResponseDTO> listS3bucket() {
-        String client = userProvider.getAuthenticatedUser().getId();
+    public List<DocumentDataResponseDTO> getAllDocumentsData() {
+        String clientId = userProvider.getAuthenticatedUser().getId();
 
-        return s3Service.listS3bucket(client);
+        return s3Service.listS3bucket(clientId);
     }
 }
 
