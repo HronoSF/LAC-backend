@@ -1,9 +1,10 @@
 package com.github.hronosf.services.impl;
 
-import com.github.hronosf.enums.Constants;
+import com.github.hronosf.dto.enums.Constants;
 import com.github.hronosf.services.DocumentGenerationService;
-import com.github.hronosf.util.Util;
+import com.github.hronosf.services.S3Service;
 import de.phip1611.Docx4JSRUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,14 +17,21 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DocumentGenerationServiceImpl implements DocumentGenerationService {
 
+    private final S3Service s3Service;
     private Map<String, WordprocessingMLPackage> loadedTemplates;
 
     @SneakyThrows
@@ -52,49 +60,74 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
 
     @Override
     @SneakyThrows
-    public String generatePretrialAppeal(Map<String, String> mappings) {
+    public String generatePretrialAppeal(Map<String, String> mappings, String clientId) {
         // fill generate docx with user data:
-        final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"));
+        final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"), clientId);
 
         // generate file name:
-        String pdf = Util.buildFileName(mappings.get("CONSUMER"), "pre-trial-appeal", ".pdf");
+        String pdf = buildFileName(mappings.get("CONSUMER"), "pre-trial-appeal", ".pdf");
 
         // convert docx to pdf:
         try (InputStream is = new FileInputStream(filledDocx);
-             OutputStream out = new FileOutputStream(new File(pdf))) {
+             OutputStream out = new FileOutputStream(pdf)) {
 
             // 1) Load DOCX into XWPFDocument
             XWPFDocument document = new XWPFDocument(is);
 
             // 2) Convert XWPFDocument to Pdf
             fr.opensagres.poi.xwpf.converter.pdf.PdfConverter.getInstance().convert(document, out, null);
-        } finally {
-            // delete generated docx:
-            Files.delete(Paths.get(filledDocx));
         }
+
         log.debug("Generated {} file", pdf);
+
+        // upload to S3:
+        uploadGeneratedDocumentToS3(pdf, clientId);
 
         return pdf;
     }
 
     @Override
     @SneakyThrows
-    public String generatePostInventory(Map<String, String> mappings) {
-        return fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("post_inventory"));
+    public String generatePostInventory(Map<String, String> mappings, String clientId) {
+        return fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("post_inventory"), clientId);
     }
 
-    private String fillUserDataAndGenerateDocx(Map<String, String> mappings, WordprocessingMLPackage wordMLPackage)
+    private String fillUserDataAndGenerateDocx(Map<String, String> mappings, WordprocessingMLPackage wordMLPackage, String clientId)
             throws Docx4JException, IOException {
         // replace variables in template:
         Docx4JSRUtil.searchAndReplace(wordMLPackage, mappings);
 
         // paths to files:
-        String docx = Util.buildFileName(mappings.get("CONSUMER"), "post-inventory", ".docx");
+        String docx = buildFileName(mappings.get("CONSUMER"), "post-inventory", ".docx");
 
         // save ready docx file:
         Docx4J.save(wordMLPackage, new FileOutputStream(docx));
 
         log.debug("Generated {} file", docx);
+
+        // upload to S3:
+        uploadGeneratedDocumentToS3(docx, clientId);
+
         return docx;
+    }
+
+    private void uploadGeneratedDocumentToS3(String path, String clientId) {
+        String keyName = clientId + "/";
+        String pathToFileInBucket = StringUtils.substringAfter(path, "generatedDocuments" + File.separator);
+
+        s3Service.uploadFileToS3(keyName + pathToFileInBucket, path, s3Service.getS3BucketName());
+    }
+
+    @SuppressWarnings("java:S5361")
+    public String buildFileName(String name, String type, String extension) {
+        return new String(
+                String.format("%s%s%s_%s_%s%s"
+                        , Constants.PATH.getValue().toAbsolutePath().toString()
+                        , File.separator
+                        , new String(name.replaceAll(StringUtils.SPACE, "-").getBytes(), Charset.defaultCharset())
+                        , type
+                        , new SimpleDateFormat("dd_MM_yyyy_ssss").format(new Date())
+                        , extension).getBytes(),
+                StandardCharsets.UTF_8);
     }
 }
