@@ -6,17 +6,14 @@ import com.github.hronosf.exceptions.ActivationCodeStillValidException;
 import com.github.hronosf.model.Client;
 import com.github.hronosf.model.ClientProfileVerification;
 import com.github.hronosf.repository.ClientAccountActivationRepository;
+import com.github.hronosf.services.ShortCodeSenderService;
 import com.github.hronosf.services.VerificationService;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
@@ -24,26 +21,13 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TwilioVerificationServiceImpl implements VerificationService {
-
-    @Value("${twilio.account.sid}")
-    private String twilioAccountSid;
-
-    @Value("${twilio.auth.token}")
-    private String twilioAuthToken;
-
-    @Value("${twilio.phone.number}")
-    private String twilioPhoneNumber;
+public class VerificationServiceImpl implements VerificationService {
 
     @Value("${twilio.verification.code.timeout.minutes}")
-    private int twilioVerificationCodeTimeout;
+    private int verificationCodeTimeout;
 
+    private final ShortCodeSenderService shortCodeSenderService;
     private final ClientAccountActivationRepository clientAccountActivationRepository;
-
-    @PostConstruct
-    public void initTwilio() {
-        Twilio.init(twilioAccountSid, twilioAuthToken);
-    }
 
     @Override
     public ClientProfileVerification sendVerificationCode(Client client) {
@@ -58,7 +42,7 @@ public class TwilioVerificationServiceImpl implements VerificationService {
             if (isVerificationTokenExpired(client.getActivationData())) {
                 activationInfo = client.getActivationData()
                         .setCode(accessCode)
-                        .setValidToTimeStamp(DateUtils.addMinutes(now, twilioVerificationCodeTimeout))
+                        .setValidToTimeStamp(DateUtils.addMinutes(now, verificationCodeTimeout))
                         .setStatus(ActivationCodeStatus.NEW);
             } else {
                 throw new ActivationCodeStillValidException();
@@ -67,7 +51,7 @@ public class TwilioVerificationServiceImpl implements VerificationService {
         } else {
             activationInfo = ClientProfileVerification.builder()
                     .id(UUID.randomUUID().toString())
-                    .validToTimeStamp(DateUtils.addMinutes(now, twilioVerificationCodeTimeout))
+                    .validToTimeStamp(DateUtils.addMinutes(now, verificationCodeTimeout))
                     .client(client)
                     .code(accessCode)
                     .status(ActivationCodeStatus.NEW)
@@ -76,18 +60,7 @@ public class TwilioVerificationServiceImpl implements VerificationService {
 
         clientAccountActivationRepository.save(activationInfo);
 
-// whatsapp:
-//        Message message = Message.creator(
-//                new PhoneNumber("whatsapp:" + client.getPhoneNumber()),
-//                new PhoneNumber("whatsapp:+14155238886"),
-//                "Код верификации: " + accessCode
-//        ).create();
-
-        Message.creator(
-                new PhoneNumber(client.getPhoneNumber()),
-                new PhoneNumber(twilioPhoneNumber),
-                "Ваш код верификации: " + accessCode
-        ).create();
+        shortCodeSenderService.sendCode(client.getPhoneNumber(), accessCode);
 
         activationInfo.setSendAtTimeStamp(now);
         clientAccountActivationRepository.save(activationInfo);
