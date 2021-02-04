@@ -41,13 +41,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(responseDTO, e.getStatus());
     }
 
-    @ExceptionHandler(value = Throwable.class)
-    public ResponseEntity<ExceptionResponseDTO> anyException(Throwable e) {
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<ExceptionResponseDTO> handlyAnyJavaException(Exception e) {
         ExceptionResponseDTO responseDTO = new ExceptionResponseDTO()
                 .setTitle("Что-то пошло не так, пожалуйста, сделайте скриншот и пришлите нам на email")
                 .setDetails(e.getMessage());
 
-        log.debug("Exception {} handled: {}\nStack trace:\n{}", e.getClass(), e.getMessage(), e.getStackTrace());
+        log.debug("Exception {} handled: {}\nStack trace:\n\n{}", e.getClass(), e.getMessage(), e.getStackTrace());
 
         return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }

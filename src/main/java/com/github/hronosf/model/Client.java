@@ -1,8 +1,8 @@
 package com.github.hronosf.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -12,18 +12,16 @@ import java.util.Set;
 
 @Data
 @Entity
-@Builder
 @Table(name = "client_data")
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedEntityGraph(
-        name = "Client.detailed_with_bank_data", attributeNodes = {
-        @NamedAttributeNode("bankData"), @NamedAttributeNode("roles")}
+        name = "Client.detailed",
+        attributeNodes = {@NamedAttributeNode("documents"), @NamedAttributeNode("roles")}
 )
-public class Client {
-
-    @Id
-    private String id;
+@DiscriminatorValue("CLIENT")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+public class Client extends User {
 
     @Column(name = "first_name")
     private String firstName;
@@ -34,13 +32,10 @@ public class Client {
     @Column(name = "last_name")
     private String lastName;
 
-    private String address;
-
-    @Column(name = "phone_number", unique = true)
-    private String phoneNumber;
+    private String email;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
-    private List<ClientBankData> bankData;
+    private List<Document> documents;
 
     @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)
     private ClientProfileVerification activationData;
@@ -51,15 +46,18 @@ public class Client {
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     private Set<Role> roles;
 
-    @Builder.Default
     @Column(name = "is_activated")
-    private boolean isActivated = false;
+    private boolean isActivated;
 
-    @Builder.Default
-    @Column(name = "registration_date")
-    private Date registrationDate = new Date();
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
 
-    @Builder.Default
-    @Column(name = "update_at")
-    private Date updatedAtDate = new Date();
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
+    @Column(name = "deleted_at")
+    private Date deletedAt;
 }

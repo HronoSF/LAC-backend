@@ -2,12 +2,15 @@ package com.github.hronosf.repository;
 
 import com.github.hronosf.model.Client;
 import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface ClientRepository extends CrudRepository<Client, String> {
+public interface ClientRepository extends UserRepository<Client> {
 
-    @EntityGraph(attributePaths = {"bankData", "roles"})
+    @EntityGraph(attributePaths = {"roles"})
     Optional<Client> findByPhoneNumber(String phoneNumber);
+
+    boolean existsByPhoneNumber(String phoneNumber);
+
+    void deleteByPhoneNumber(String phoneNumber);
 }

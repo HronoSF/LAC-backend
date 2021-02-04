@@ -18,13 +18,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableWebSecurity
 @Profile("security")
 @SpringBootConfiguration
 @Import(AuthenticationProvider.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     @Value("${security.white.list}")
     private String[] whiteList;
@@ -41,7 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(whiteList).permitAll()
                 .anyRequest().authenticated()
-                .and().cors().disable().csrf().disable();
+                .and()
+                .csrf().disable();
     }
 
     @Bean
@@ -51,5 +54,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         grantedAuthoritiesConverter.setAuthorityPrefix(Roles.getPrefix());
 
         return new AuthenticationConverter(grantedAuthoritiesConverter, RoleToPermissionMapping.ROLES_TO_PERMISSIONS);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedHeaders("*")
+                .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
     }
 }

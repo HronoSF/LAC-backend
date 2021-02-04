@@ -1,9 +1,8 @@
 package com.github.hronosf.services;
 
 import com.amazonaws.services.s3.model.S3Object;
-import com.github.hronosf.dto.DocumentDataResponseDTO;
 
-import java.util.List;
+import java.net.URL;
 
 public interface S3Service {
 
@@ -13,5 +12,5 @@ public interface S3Service {
 
     String getS3BucketName();
 
-    List<DocumentDataResponseDTO> listS3bucket(String prefix);
+    String getS3Url(String key);
 }

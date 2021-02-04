@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @CrossOrigin
 @EnableScheduling
 @EnableAspectJAutoProxy
+@EnableTransactionManagement
 @SpringBootApplication(scanBasePackages = {"com.github.hronosf"})
 public class LacApplication {
 

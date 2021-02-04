@@ -1,8 +1,9 @@
 package com.github.hronosf.services.impl;
 
+import com.github.hronosf.dto.PostInventoryRequestDTO;
+import com.github.hronosf.dto.PreTrialAppealRequestDTO;
 import com.github.hronosf.dto.enums.Constants;
 import com.github.hronosf.services.DocumentGenerationService;
-import com.github.hronosf.services.S3Service;
 import de.phip1611.Docx4JSRUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -12,6 +13,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.docx4j.Docx4J;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DocumentGenerationServiceImpl implements DocumentGenerationService {
 
-    private final S3Service s3Service;
     private Map<String, WordprocessingMLPackage> loadedTemplates;
 
     @SneakyThrows
@@ -60,9 +61,46 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
 
     @Override
     @SneakyThrows
-    public String generatePretrialAppeal(Map<String, String> mappings, String clientId) {
+    public String generatePretrialAppeal(PreTrialAppealRequestDTO request) {
+        Map<String, String> mappings = new HashMap<>();
+
+        // seller's data:
+        mappings.put("SELLER", request.getSellerName());
+
+        mappings.put("INN", request.getSellerINN());
+        mappings.put("SELADR", request.getSellerAddress());
+
+        // consumer's data:
+        final String consumerFullName = String.format("%s %s %s"
+                , request.getLastName()
+                , request.getFirstName()
+                , request.getMiddleName() == null ? StringUtils.EMPTY : request.getMiddleName());
+
+        mappings.put("CONSUMER", consumerFullName);
+        mappings.put("CONADR", request.getAddress());
+
+        mappings.put("BANKNAME", request.getConsumerBankName());
+        mappings.put("BIK", request.getConsumerBankBik());
+        mappings.put("CORRACC", request.getConsumerBankCorrAcc());
+        mappings.put("CONSACC", request.getCustomerAccountNumber());
+
+        // purchase data:
+        mappings.put("PURCHDATA",
+                DateTimeFormat.forPattern("dd.MM.yyyy")
+                        .print(
+                                DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                                        .parseDateTime(request.getPurchaseData()
+                                        )
+                        )
+        );
+
+        mappings.put("PRODUCT", request.getProductName());
+
+        // date:
+        mappings.put("CLAIMDATA", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+
         // fill generate docx with user data:
-        final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"), clientId);
+        final String filledDocx = fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("pretrial"));
 
         // generate file name:
         String pdf = buildFileName(mappings.get("CONSUMER"), "pre-trial-appeal", ".pdf");
@@ -80,19 +118,23 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
 
         log.debug("Generated {} file", pdf);
 
-        // upload to S3:
-        uploadGeneratedDocumentToS3(pdf, clientId);
-
         return pdf;
     }
 
     @Override
     @SneakyThrows
-    public String generatePostInventory(Map<String, String> mappings, String clientId) {
-        return fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("post_inventory"), clientId);
+    public String generatePostInventory(PostInventoryRequestDTO request) {
+        Map<String, String> mappings = new HashMap<>();
+
+        // seller's data:
+        mappings.put("CONSUMER", request.getConsumerName());
+        mappings.put("SELLER", request.getSellerName());
+        mappings.put("SELADR", request.getSellerAddress());
+
+        return fillUserDataAndGenerateDocx(mappings, loadedTemplates.get("post_inventory"));
     }
 
-    private String fillUserDataAndGenerateDocx(Map<String, String> mappings, WordprocessingMLPackage wordMLPackage, String clientId)
+    private String fillUserDataAndGenerateDocx(Map<String, String> mappings, WordprocessingMLPackage wordMLPackage)
             throws Docx4JException, IOException {
         // replace variables in template:
         Docx4JSRUtil.searchAndReplace(wordMLPackage, mappings);
@@ -105,17 +147,7 @@ public class DocumentGenerationServiceImpl implements DocumentGenerationService 
 
         log.debug("Generated {} file", docx);
 
-        // upload to S3:
-        uploadGeneratedDocumentToS3(docx, clientId);
-
         return docx;
-    }
-
-    private void uploadGeneratedDocumentToS3(String path, String clientId) {
-        String keyName = clientId + "/";
-        String pathToFileInBucket = StringUtils.substringAfter(path, "generatedDocuments" + File.separator);
-
-        s3Service.uploadFileToS3(keyName + pathToFileInBucket, path, s3Service.getS3BucketName());
     }
 
     @SuppressWarnings("java:S5361")

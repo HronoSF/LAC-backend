@@ -15,8 +15,7 @@ public class ClientProfileResponseDTO {
     private String firstName;
     private String middleName;
     private String lastName;
-    private String address;
+    private String email;
     private String phoneNumber;
     private List<String> roles;
-    private ClientBankDataResponseDTO latestBankData;
 }

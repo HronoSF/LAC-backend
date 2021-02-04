@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -45,4 +46,7 @@ public class PreTrialAppealRequestDTO extends ClientRegistrationRequestDTO {
     @NotNull
     @InnSwiftBik(message = "Некорректное значение поля INN продавца")
     private String sellerINN;
+
+    @NotBlank
+    protected String address;
 }

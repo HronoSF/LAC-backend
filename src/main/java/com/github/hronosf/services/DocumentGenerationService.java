@@ -1,10 +1,11 @@
 package com.github.hronosf.services;
 
-import java.util.Map;
+import com.github.hronosf.dto.PostInventoryRequestDTO;
+import com.github.hronosf.dto.PreTrialAppealRequestDTO;
 
 public interface DocumentGenerationService {
 
-    String generatePretrialAppeal(Map<String, String> mappings, String clientId);
+    String generatePretrialAppeal(PreTrialAppealRequestDTO request);
 
-    String generatePostInventory(Map<String, String> mappings, String clientId);
+    String generatePostInventory(PostInventoryRequestDTO request);
 }

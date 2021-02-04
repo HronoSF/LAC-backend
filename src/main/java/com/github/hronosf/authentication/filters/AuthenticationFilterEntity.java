@@ -17,7 +17,7 @@ public class AuthenticationFilterEntity {
                                                                       @Autowired AuthenticationProvider authenticationProvider) {
         FilterRegistrationBean<AuthenticationFilter> cognitoAuthBean = new FilterRegistrationBean<>();
 
-        cognitoAuthBean.setFilter(new AuthenticationFilter(userService, userProvider, authenticationProvider));
+        cognitoAuthBean.setFilter(new AuthenticationFilter(userProvider, authenticationProvider, userService));
         cognitoAuthBean.addUrlPatterns("/api/v1/*");
 
         return cognitoAuthBean;

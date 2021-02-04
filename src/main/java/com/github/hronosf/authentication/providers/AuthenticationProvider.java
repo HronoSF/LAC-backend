@@ -2,6 +2,7 @@ package com.github.hronosf.authentication.providers;
 
 import com.github.hronosf.dto.enums.Permissions;
 import com.github.hronosf.dto.enums.Roles;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
@@ -32,11 +33,10 @@ public class AuthenticationProvider {
                 ((Jwt) authentication.getPrincipal()).getClaimAsString("phone_number");
     }
 
-    public List<Roles> getRoles() {
+    public List<String> getRoles() {
         return getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(a -> a.startsWith(Roles.getPrefix()))
-                .map(Roles::valueOf)
                 .collect(Collectors.toList());
     }
 
@@ -46,6 +46,11 @@ public class AuthenticationProvider {
                 .filter(a -> !a.startsWith(Roles.getPrefix()))
                 .map(Permissions::valueOf)
                 .collect(Collectors.toList());
+    }
+
+    public boolean hasRole(String role) {
+        return getRoles().stream()
+                .anyMatch(r -> StringUtils.equals(r, role) || StringUtils.equals(r, Roles.getPrefix() + role));
     }
 
     public boolean isAnonymous() {

@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TwilioShortCodeSenderServiceImpl implements ShortCodeSenderService {
+public class TwilioShortCodeSenderService implements ShortCodeSenderService {
 
     @Value("${twilio.account.sid}")
     private String twilioAccountSid;
@@ -26,7 +26,7 @@ public class TwilioShortCodeSenderServiceImpl implements ShortCodeSenderService 
     @Value("${twilio.phone.number}")
     private String twilioPhoneNumber;
 
-    @Value("${twilio.verification.code.timeout.minutes}")
+    @Value("${verification.code.timeout.minutes}")
     private int twilioVerificationCodeTimeout;
 
     @PostConstruct

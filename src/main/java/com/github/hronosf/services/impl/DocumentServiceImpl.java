@@ -2,22 +2,24 @@ package com.github.hronosf.services.impl;
 
 import com.github.hronosf.authentication.providers.UserProvider;
 import com.github.hronosf.dto.DocumentDataResponseDTO;
+import com.github.hronosf.dto.DocumentSearchRequestDTO;
 import com.github.hronosf.dto.PostInventoryRequestDTO;
 import com.github.hronosf.dto.PreTrialAppealRequestDTO;
-import com.github.hronosf.services.DocumentGenerationService;
-import com.github.hronosf.services.DocumentService;
-import com.github.hronosf.services.S3Service;
-import com.github.hronosf.services.UserService;
+import com.github.hronosf.dto.enums.DocumentType;
+import com.github.hronosf.mappers.DocumentMapper;
+import com.github.hronosf.model.*;
+import com.github.hronosf.repository.DocumentRepository;
+import com.github.hronosf.services.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.format.DateTimeFormat;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,74 +27,109 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final UserProvider userProvider;
 
+    private final DocumentMapper mapper;
+
+    private final DocumentRepository documentRepository;
+
     private final S3Service s3Service;
-    private final UserService userService;
+    private final ClientService clientService;
+    private final ProductDataService productDataService;
+    private final UserBankDataService userBankDataService;
     private final DocumentGenerationService documentGenerationService;
 
     @Override
     public String generatePreTrialAppeal(PreTrialAppealRequestDTO request) {
-        Map<String, String> consumerAndSellerData = new HashMap<>();
+        // Generate doc:
+        String pathToDocument = documentGenerationService.generatePretrialAppeal(request);
 
-        // seller's data:
-        consumerAndSellerData.put("SELLER", request.getSellerName());
-        consumerAndSellerData.put("INN", request.getSellerINN());
-        consumerAndSellerData.put("SELADR", request.getSellerAddress());
+        // Upload to S3:
+        Client client = clientService.getByPhoneNumber(request.getPhoneNumber());
+        uploadGeneratedDocumentToS3(pathToDocument, client.getId());
 
-        // consumer's data:
-        final String consumerFullName = String.format("%s %s %s"
-                , request.getLastName()
-                , request.getFirstName()
-                , request.getMiddleName() == null ? StringUtils.EMPTY : request.getMiddleName());
+        // save client bank data:
+        ProductData productData = productDataService.saveProductData(request);
+        ClientBankData clientBankData = userBankDataService.saveClientBankData(request);
 
-        consumerAndSellerData.put("CONSUMER", consumerFullName);
-        consumerAndSellerData.put("CONADR", request.getAddress());
-
-        consumerAndSellerData.put("BANKNAME", request.getConsumerBankName());
-        consumerAndSellerData.put("BIK", request.getConsumerBankBik());
-        consumerAndSellerData.put("CORRACC", request.getConsumerBankCorrAcc());
-        consumerAndSellerData.put("CONSACC", request.getFirstName());
-
-        // purchase data:
-        consumerAndSellerData.put("PURCHDATA",
-                DateTimeFormat.forPattern("dd.MM.yyyy")
-                        .print(
-                                DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                                        .parseDateTime(request.getPurchaseData()
-                                        )
-                        )
+        // save document data:
+        saveDocument(
+                client,
+                clientBankData,
+                productData,
+                getFileName(pathToDocument),
+                DocumentType.PRE_TRIAL
         );
 
-        consumerAndSellerData.put("PRODUCT", request.getProductName());
-
-        // date:
-        consumerAndSellerData.put("CLAIMDATA", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
-
-        return documentGenerationService.generatePretrialAppeal(
-                consumerAndSellerData,
-                userService.getByPhoneNumber(request.getPhoneNumber()).getId()
-        );
+        return pathToDocument;
     }
 
     @Override
     public String generatePostInventory(PostInventoryRequestDTO request) {
-        Map<String, String> sellerData = new HashMap<>();
+        Client client = clientService.getByPhoneNumber(request.getPhoneNumber());
+        String pathToDocument = documentGenerationService.generatePostInventory(request);
 
-        // seller's data:
-        sellerData.put("CONSUMER", request.getConsumerName());
-        sellerData.put("SELLER", request.getSellerName());
-        sellerData.put("SELADR", request.getSellerAddress());
+        // upload to S3:
+        uploadGeneratedDocumentToS3(pathToDocument, client.getId());
 
-        return documentGenerationService.generatePostInventory(
-                sellerData,
-                userService.getByPhoneNumber(request.getPhoneNumber()).getId()
+        saveDocument(
+                client,
+                null,
+                null,
+                getFileName(pathToDocument),
+                DocumentType.POST_INVENTORY
         );
+
+        return pathToDocument;
     }
 
     @Override
-    public List<DocumentDataResponseDTO> getAllDocumentsData() {
+    public List<DocumentDataResponseDTO> getDocumentsOfLoggedUser() {
         String clientId = userProvider.getAuthenticatedUser().getId();
 
-        return s3Service.listS3bucket(clientId);
+        // TODO: add filtering
+        return documentRepository.getAllByClientId(clientId)
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocumentDataResponseDTO> searchClientDocuments(Pageable pageable, DocumentSearchRequestDTO request) {
+        User user = userProvider.getAuthenticatedUser();
+
+        if (userProvider.isUserClient()) {
+
+        } else if (userProvider.isUserAdministrator()) {
+
+        }
+
+        return null;
+    }
+
+    private void saveDocument(Client client, ClientBankData clientBankData,
+                              ProductData productData, String fileName, DocumentType documentType) {
+        Document document = new Document()
+                .setId(UUID.randomUUID().toString())
+                .setClient(client)
+                .setClientBankData(clientBankData)
+                .setProductData(productData)
+                .setCreatedAt(new Date())
+                .setType(documentType)
+                .setSavedBeforeActivation(!client.isActivated())
+                .setUrl(s3Service.getS3Url(fileName))
+                .setDocumentName(fileName);
+
+        documentRepository.save(document);
+    }
+
+    private void uploadGeneratedDocumentToS3(String path, String clientId) {
+        String keyName = clientId + "/";
+        String pathToFileInBucket = StringUtils.substringAfter(path, "generatedDocuments" + File.separator);
+
+        s3Service.uploadFileToS3(keyName + pathToFileInBucket, path, s3Service.getS3BucketName());
+    }
+
+    private String getFileName(String pathToDocument) {
+        return StringUtils.substringAfterLast(pathToDocument, File.separator);
     }
 }
 

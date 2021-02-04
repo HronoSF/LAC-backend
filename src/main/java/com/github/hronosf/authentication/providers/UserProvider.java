@@ -1,7 +1,9 @@
 package com.github.hronosf.authentication.providers;
 
 import com.github.hronosf.authentication.JwtUserAuthenticationToken;
+import com.github.hronosf.dto.enums.Roles;
 import com.github.hronosf.model.Client;
+import com.github.hronosf.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,16 +15,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserProvider {
 
-    public void setAuthenticatedUser(Client client, String role) {
+    private final Optional<AuthenticationProvider> optAuthenticationProvider;
+
+    public void setAuthenticatedUser(User user, String role) {
         getAuthenticatedUserContext()
                 .ifPresent(userContext -> {
-                    userContext.setUser(client);
+                    userContext.setUser(user);
                     userContext.setRole(role);
                 });
     }
 
-    public Client getAuthenticatedUser() {
-        return (Client) getAuthenticatedUserContext()
+    public User getAuthenticatedUser() {
+        return (User) getAuthenticatedUserContext()
                 .map(JwtUserAuthenticationToken::getUser)
                 .orElse(null);
     }
@@ -31,6 +35,40 @@ public class UserProvider {
         return getAuthenticatedUserContext()
                 .map(JwtUserAuthenticationToken::getRole)
                 .orElse(null);
+    }
+
+    public boolean isUserClient() {
+        return optAuthenticationProvider
+                .map(authenticationProvider -> authenticationProvider.hasRole(Roles.CLIENT.getName()))
+                .orElse(false);
+    }
+
+    public boolean activatedClient() {
+        if (isUserClient()) {
+            Client client = getCurrentUserAs(Client.class);
+            return client != null && client.isActivated() && !client.isDeleted();
+        }
+
+        return false;
+    }
+
+    public boolean isUserAdministrator() {
+        return optAuthenticationProvider
+                .map(authenticationProvider -> authenticationProvider.hasRole(Roles.ADMIN.getName()))
+                .orElse(false);
+    }
+
+    public <T extends User> T getCurrentUserAs(Class<T> clazz) {
+        User user = getAuthenticatedUser();
+        if (user != null) {
+            if (clazz.isAssignableFrom(user.getClass())) {
+                return clazz.cast(user);
+            } else {
+//                throw new UserCastException("Cannot return user as " + clazz.getName()
+//                        + ". User is " + user.getClass().getName());
+            }
+        }
+        return null;
     }
 
     private Optional<JwtUserAuthenticationToken> getAuthenticatedUserContext() {

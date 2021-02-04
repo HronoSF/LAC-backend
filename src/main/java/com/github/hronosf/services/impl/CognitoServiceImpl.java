@@ -4,6 +4,7 @@ import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.*;
 import com.github.hronosf.services.CognitoService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,15 @@ public class CognitoServiceImpl implements CognitoService {
         awsIdentityProvider.adminSetUserPassword(cognitoSetUserPasswordRequest);
     }
 
+    @Override
+    @SneakyThrows
+    public void deleteUser(String username) {
+        AdminDeleteUserRequest adminDeleteUserRequest = new AdminDeleteUserRequest();
+        adminDeleteUserRequest.setUsername(username);
+        adminDeleteUserRequest.setUserPoolId(cognitoPoolId);
+        awsIdentityProvider.adminDeleteUser(adminDeleteUserRequest);
+    }
+
     private void createCognitoUser(String username, String password) {
         AdminCreateUserRequest cognitoCreateUserRequest = new AdminCreateUserRequest();
         cognitoCreateUserRequest.setTemporaryPassword(password);
@@ -53,13 +63,6 @@ public class CognitoServiceImpl implements CognitoService {
         adminAddUserToGroupRequest.setUserPoolId(cognitoPoolId);
         adminAddUserToGroupRequest.setUsername(username);
         awsIdentityProvider.adminAddUserToGroup(adminAddUserToGroupRequest);
-    }
-
-    private void deleteUser(String username) {
-        AdminDeleteUserRequest adminDeleteUserRequest = new AdminDeleteUserRequest();
-        adminDeleteUserRequest.setUsername(username);
-        adminDeleteUserRequest.setUserPoolId(cognitoPoolId);
-        awsIdentityProvider.adminDeleteUser(adminDeleteUserRequest);
     }
 
     private boolean isUsernameTaken(String username) {

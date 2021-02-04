@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService {
 
-    @Value("${twilio.verification.code.timeout.minutes}")
+    @Value("${verification.code.timeout.minutes}")
     private int verificationCodeTimeout;
 
     private final ShortCodeSenderService shortCodeSenderService;

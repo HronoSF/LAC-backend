@@ -20,8 +20,7 @@ public class ClientRegistrationRequestDTO {
     @NotBlank
     protected String lastName;
 
-    @NotBlank
-    protected String address;
+    protected String email;
 
     @NotNull
     protected String phoneNumber;

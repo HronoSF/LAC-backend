@@ -1,9 +1,14 @@
 package com.github.hronosf.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Data
 @Entity
@@ -24,15 +29,9 @@ public class ClientBankData {
     @Column(name = "bank_corr_acc")
     private String bankCorrAcc;
 
-    @Column(name = "account_number")
+    @Column(name = "client_account_number")
     private String accountNumber;
 
-    @Builder.Default
-    @Column(name = "created_at")
-    private Date createdAt = new Date();
-
-    @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
+    @Column(name = "client_address")
+    private String clientAddress;
 }

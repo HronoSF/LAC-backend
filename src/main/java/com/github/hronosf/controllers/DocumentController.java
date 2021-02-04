@@ -4,7 +4,7 @@ import com.github.hronosf.dto.DocumentDataResponseDTO;
 import com.github.hronosf.dto.PostInventoryRequestDTO;
 import com.github.hronosf.dto.PreTrialAppealRequestDTO;
 import com.github.hronosf.services.DocumentService;
-import com.github.hronosf.services.impl.UserServiceImpl;
+import com.github.hronosf.services.impl.ClientServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
@@ -22,12 +22,12 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentService documentService;
-    private final UserServiceImpl userProfileService;
+    private final ClientServiceImpl userService;
 
     @Operation(summary = "Generation of Pre-Trial Appeal")
     @PostMapping(value = "/generate_pretrial_appeal", produces = "application/pdf")
     public HttpEntity<Resource> generatePreTrialAppeal(@RequestBody @Valid PreTrialAppealRequestDTO request) {
-        userProfileService.createUserIfNotExistAndAddUserBankData(request);
+        userService.createClientIfNotExist(request);
         return new HttpEntity<>(new FileSystemResource(documentService.generatePreTrialAppeal(request)));
     }
 
@@ -38,9 +38,9 @@ public class DocumentController {
     }
 
     @GetMapping("/get_all")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@userProvider.activatedClient()")
     @Operation(summary = "Get links to all authenticated user documents")
-    public List<DocumentDataResponseDTO> listDocumentsOfAuthenticatedClient() {
-        return documentService.getAllDocumentsData();
+    public List<DocumentDataResponseDTO> searchClientDocuments() {
+        return documentService.getDocumentsOfLoggedUser();
     }
 }
