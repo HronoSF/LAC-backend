@@ -6,7 +6,7 @@ CREATE TABLE "user"
 );
 
 
-CREATE TABLE client_data
+CREATE TABLE client
 (
     id           varchar(100)
         CONSTRAINT pk_client_data PRIMARY KEY
@@ -58,7 +58,7 @@ CREATE TABLE documents
     updated_at                 TIMESTAMP              DEFAULT NULL,
     CONSTRAINT "pk_documents.documents_documents" PRIMARY KEY (id),
     CONSTRAINT "fk_documents.documents_client" FOREIGN KEY (client_id)
-        REFERENCES client_data (id)
+        REFERENCES client (id)
         ON UPDATE NO ACTION ON DELETE NO ACTION,
     CONSTRAINT "fk_documents.product_data" FOREIGN KEY (product_data_id)
         REFERENCES product_data (id)
@@ -78,6 +78,6 @@ CREATE TABLE client_profile_activation_data
     status    varchar(50) DEFAULT NULL,
     CONSTRAINT "pk_client_profile_activation_data.client_activation_data" PRIMARY KEY (id),
     CONSTRAINT "fk_client_profile_activation_data.client_activation_data" FOREIGN KEY (client_id)
-        REFERENCES client_data (id)
+        REFERENCES client (id)
         ON UPDATE NO ACTION ON DELETE NO ACTION
 )

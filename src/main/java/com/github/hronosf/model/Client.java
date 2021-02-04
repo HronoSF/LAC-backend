@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "client_data")
+@Table(name = "client")
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedEntityGraph(

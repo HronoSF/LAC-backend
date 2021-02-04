@@ -11,8 +11,10 @@ import org.mapstruct.ReportingPolicy;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", unmappedSourcePolicy = ReportingPolicy.IGNORE
-        , imports = {Collectors.class, Role.class, UUID.class})
+@Mapper(componentModel = "spring",
+        unmappedSourcePolicy = ReportingPolicy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        imports = {Collectors.class, Role.class, UUID.class})
 public interface ClientMapper {
 
     @Mapping(target = "roles",
