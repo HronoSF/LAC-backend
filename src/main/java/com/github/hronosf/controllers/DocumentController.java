@@ -38,8 +38,8 @@ public class DocumentController {
     }
 
     @GetMapping("/get_all")
-    @PreAuthorize("@userProvider.activatedClient()")
-    @Operation(summary = "Get links to all authenticated user documents")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get all user documents info")
     public List<DocumentDataResponseDTO> searchClientDocuments() {
         return documentService.getDocumentsOfLoggedUser();
     }

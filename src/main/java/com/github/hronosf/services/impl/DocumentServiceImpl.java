@@ -97,9 +97,7 @@ public class DocumentServiceImpl implements DocumentService {
         User user = userProvider.getAuthenticatedUser();
 
         if (userProvider.isUserClient()) {
-
-        } else if (userProvider.isUserAdministrator()) {
-
+            request.setClientId(user.getId());
         }
 
         return null;

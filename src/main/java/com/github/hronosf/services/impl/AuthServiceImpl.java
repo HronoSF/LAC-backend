@@ -124,7 +124,7 @@ public class AuthServiceImpl implements AuthService {
         cookie.setPath("/");
         cookie.setDomain(domain);
         cookie.setMaxAge(age);
-        //cookie.setSecure(true);
+//        cookie.setSecure(true);
         return cookie;
     }
 

@@ -2,7 +2,9 @@ package com.github.hronosf.authentication.filters;
 
 import com.github.hronosf.authentication.providers.AuthenticationProvider;
 import com.github.hronosf.authentication.providers.UserProvider;
+import com.github.hronosf.exceptions.ClientNotActivatedException;
 import com.github.hronosf.exceptions.ClientNotFoundException;
+import com.github.hronosf.model.Client;
 import com.github.hronosf.model.User;
 import com.github.hronosf.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +41,26 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 throw new ClientNotFoundException("номером телефона", phoneNumber);
             }
 
+            validateIfClient(user);
+
             userProvider.setAuthenticatedUser(user, authenticationProvider.getCognitoGroup());
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void validateIfClient(User user) {
+        // check is client activated and not deleted:
+        if (user instanceof Client) {
+            Client client = (Client) user;
+
+            if (!client.isActivated()) {
+                throw new ClientNotActivatedException(user.getPhoneNumber());
+            }
+
+            if (client.isDeleted()) {
+                throw new ClientNotFoundException("номером телефона", user.getPhoneNumber());
+            }
+        }
     }
 }

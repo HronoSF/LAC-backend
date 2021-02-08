@@ -2,7 +2,6 @@ package com.github.hronosf.authentication.providers;
 
 import com.github.hronosf.authentication.JwtUserAuthenticationToken;
 import com.github.hronosf.dto.enums.Roles;
-import com.github.hronosf.model.Client;
 import com.github.hronosf.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContext;
@@ -43,15 +42,6 @@ public class UserProvider {
                 .orElse(false);
     }
 
-    public boolean activatedClient() {
-        if (isUserClient()) {
-            Client client = getCurrentUserAs(Client.class);
-            return client != null && client.isActivated() && !client.isDeleted();
-        }
-
-        return false;
-    }
-
     public boolean isUserAdministrator() {
         return optAuthenticationProvider
                 .map(authenticationProvider -> authenticationProvider.hasRole(Roles.ADMIN.getName()))
@@ -64,8 +54,10 @@ public class UserProvider {
             if (clazz.isAssignableFrom(user.getClass())) {
                 return clazz.cast(user);
             } else {
-//                throw new UserCastException("Cannot return user as " + clazz.getName()
-//                        + ". User is " + user.getClass().getName());
+                throw new IllegalArgumentException(
+                        "User can't be casted to " + clazz.getName()
+                                + ". Original class is " + user.getClass().getName()
+                );
             }
         }
         return null;

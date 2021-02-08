@@ -17,4 +17,6 @@ public class DocumentSearchRequestDTO {
     private String sellerINN;
 
     private List<DocumentType> documentTypes;
+
+    private String clientId;
 }

@@ -1,9 +1,11 @@
 package com.github.hronosf.controllers;
 
 import com.github.hronosf.dto.*;
+import com.github.hronosf.dto.enums.Roles;
 import com.github.hronosf.services.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,14 +35,16 @@ public class ClientController {
     }
 
     @GetMapping
-    @PreAuthorize("@userProvider.activatedClient()")
+    @Secured(Roles.Names.CLIENT)
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get logged client profile")
     public ClientProfileResponseDTO getClientProfile() {
         return clientService.getAuthenticatedClient();
     }
 
     @PatchMapping
-    @PreAuthorize("@userProvider.activatedClient()")
+    @Secured(Roles.Names.CLIENT)
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Change client personal data")
     public ClientProfileResponseDTO changeClientData(ClientProfileUpdateRequestDTO request) {
         return clientService.updateClientPersonalData(request);

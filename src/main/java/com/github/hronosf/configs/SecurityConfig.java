@@ -18,7 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableWebSecurity
@@ -44,6 +44,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .antMatchers(whiteList).permitAll()
                 .anyRequest().authenticated()
                 .and()
+                .cors()
+                .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+                .and()
                 .csrf().disable();
     }
 
@@ -54,13 +57,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         grantedAuthoritiesConverter.setAuthorityPrefix(Roles.getPrefix());
 
         return new AuthenticationConverter(grantedAuthoritiesConverter, RoleToPermissionMapping.ROLES_TO_PERMISSIONS);
-    }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedHeaders("*")
-                .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
     }
 }
