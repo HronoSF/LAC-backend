@@ -8,9 +8,7 @@ CREATE TABLE "user"
 
 CREATE TABLE client
 (
-    id           varchar(100)
-        CONSTRAINT pk_client_data PRIMARY KEY
-        CONSTRAINT fk_client_user REFERENCES "user",
+    id           varchar(100),
     first_name   varchar(255),
     last_name    varchar(255),
     middle_name  varchar(255),
@@ -19,7 +17,9 @@ CREATE TABLE client
     is_deleted   bool      DEFAULT FALSE,
     created_at   TIMESTAMP DEFAULT now(),
     updated_at   TIMESTAMP DEFAULT NULL,
-    deleted_at   TIMESTAMP DEFAULT NULL
+    deleted_at   TIMESTAMP DEFAULT NULL,
+    CONSTRAINT pk_client_data PRIMARY KEY (id),
+    CONSTRAINT fk_client_user FOREIGN KEY (id) REFERENCES "user" (id)
 );
 
 CREATE TABLE client_bank_data

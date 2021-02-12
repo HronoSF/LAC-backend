@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Scope;
 public class AwsClientConfiguration {
 
     @Bean
-    @Profile("!local")
+    @Profile("!local && !test")
     public AmazonS3 getS3Client(@Autowired AWSCredentialsProvider credentialsProvider, @Value("${aws.region}") String region) {
         return AmazonS3ClientBuilder.
                 standard()
@@ -31,7 +31,7 @@ public class AwsClientConfiguration {
     }
 
     @Bean
-    @Profile("!local")
+    @Profile("!local && !test")
     public AWSCognitoIdentityProvider cognitoIdentityProvider(@Autowired AWSCredentialsProvider credentialsProvider,
                                                               @Value("${aws.region}") String region) {
         return AWSCognitoIdentityProviderClientBuilder.standard()
@@ -41,7 +41,7 @@ public class AwsClientConfiguration {
     }
 
     @Bean
-    @Profile("!local")
+    @Profile("!local && !test")
     public AWSCredentialsProvider credentialsProvider(@Value("${aws.accessKey}") String accessKey
             , @Value("${aws.secretKey}") String secretKey) {
         return new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey));
